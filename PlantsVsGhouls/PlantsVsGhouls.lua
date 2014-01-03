@@ -287,24 +287,26 @@ for i = 1, 1 do
 			Plants[i][j].frame:SetPoint("BottomLeft", Plants[i][j - 1].frame, "BottomRight", 0, 0)
 		end
 		Plants[i][j].frame:SetWidth(79)
-		if j == 1 then
-			Plants[i][j].frame:SetHeight(95)
-		elseif j == 2 then
-			Plants[i][j].frame:SetHeight(100)
-		elseif j == 3 then
-			Plants[i][j].frame:SetHeight(105)
-		elseif j == 4 then
-			Plants[i][j].frame:SetHeight(110)
-		elseif j == 5 then
-			Plants[i][j].frame:SetHeight(110)
-		elseif j == 6 then
-			Plants[i][j].frame:SetHeight(110)
-		elseif j == 7 then
-			Plants[i][j].frame:SetHeight(105)
-		elseif j == 8 then
-			Plants[i][j].frame:SetHeight(100)
-		elseif j == 9 then
-			Plants[i][j].frame:SetHeight(95)
+		if i == 1 then
+			if j == 1 then
+				Plants[i][j].frame:SetHeight(95)
+			elseif j == 2 then
+				Plants[i][j].frame:SetHeight(100)
+			elseif j == 3 then
+				Plants[i][j].frame:SetHeight(105)
+			elseif j == 4 then
+				Plants[i][j].frame:SetHeight(110)
+			elseif j == 5 then
+				Plants[i][j].frame:SetHeight(110)
+			elseif j == 6 then
+				Plants[i][j].frame:SetHeight(110)
+			elseif j == 7 then
+				Plants[i][j].frame:SetHeight(105)
+			elseif j == 8 then
+				Plants[i][j].frame:SetHeight(100)
+			elseif j == 9 then
+				Plants[i][j].frame:SetHeight(95)
+			end
 		end
 		Plants[i][j].frame:SetAlpha(1)
 		Plants[i][j].frame:SetBackdrop(backdrop)
@@ -338,7 +340,7 @@ function OnLeave(model)
 	if PlantMode then
 		temp:ClearModel()
 	elseif DestroyMode then
-		model:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
+		model:SetLight(1, 0, 0, 1, 0, 1, 0.7, 0.7, 0.7, 1, 0.8, 0.8, 0.64)
 	end
 end
 
@@ -355,7 +357,7 @@ function OnMouseDown(self, button, model, ghoul)
 			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
 		elseif DestroyMode then
 			DisableModes()
-			model:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
+			model:SetLight(1, 0, 0, 1, 0, 1, 0.7, 0.7, 0.7, 1, 0.8, 0.8, 0.64)
 			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
 		end
 	end
@@ -390,7 +392,7 @@ end
 function DestroyPlant(model)
 	if DestroyMode and Plants[CurrentLine][CurrentRow].type ~= nil then
 		Plants[CurrentLine][CurrentRow].type = nil
-		model:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
+		model:SetLight(1, 0, 0, 1, 0, 1, 0.7, 0.7, 0.7, 1, 0.8, 0.8, 0.64)
 		model:ClearModel()
 		DisableModes()
 		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\shovel.ogg", "Master")
@@ -469,9 +471,9 @@ end
 
 function InitModelGhoul(line)
 	ghoulmodel.line = line
-	ghoulmodel:SetDisplayInfo(137)
-	ghoulmodel.pos = 900
 	ghoulmodel.next = 9
+	ghoulmodel.pos = 900
+	ghoulmodel:SetDisplayInfo(137)
 	ghoulmodel:SetAlpha(1)
 	ghoulmodel:SetCustomCamera(1)
 	ghoulmodel:SetWidth(200)
@@ -537,15 +539,11 @@ function InitAll()
 	InitModelSlot0()
 	InitModelSlot1()
 	InitModelSlot2()
-	InitModel(Plants[1][1].model, 1, 1)
-	InitModel(Plants[1][2].model, 1, 2)
-	InitModel(Plants[1][3].model, 1, 3)
-	InitModel(Plants[1][4].model, 1, 4)
-	InitModel(Plants[1][5].model, 1, 5)
-	InitModel(Plants[1][6].model, 1, 6)
-	InitModel(Plants[1][7].model, 1, 7)
-	InitModel(Plants[1][8].model, 1, 8)
-	InitModel(Plants[1][9].model, 1, 9)
+	for i = 1, 1 do
+		for j = 1, 9 do
+			InitModel(Plants[i][j].model, i, j)
+		end
+	end
 	InitModelGhoul(1)
 end
 
