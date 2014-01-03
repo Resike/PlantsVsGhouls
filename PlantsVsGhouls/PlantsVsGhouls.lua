@@ -13,59 +13,59 @@ mainframe:Hide()
 
 local Plants = {
 	[1] = {
-		[1] = {type = nil, degree = 0},
-		[2] = {type = nil, degree = 0},
-		[3] = {type = nil, degree = 0},
-		[4] = {type = nil, degree = 0},
-		[5] = {type = nil, degree = 0},
-		[6] = {type = nil, degree = 0},
-		[7] = {type = nil, degree = 0},
-		[8] = {type = nil, degree = 0},
-		[9] = {type = nil, degree = 0}
+		[1] = {frame, model, x, y, type},
+		[2] = {frame, model, x, y, type},
+		[3] = {frame, model, x, y, type},
+		[4] = {frame, model, x, y, type},
+		[5] = {frame, model, x, y, type},
+		[6] = {frame, model, x, y, type},
+		[7] = {frame, model, x, y, type},
+		[8] = {frame, model, x, y, type},
+		[9] = {frame, model, x, y, type}
 	},
 	[2] = {
-		[1] = {type = nil, degree = 0},
-		[2] = {type = nil, degree = 0},
-		[3] = {type = nil, degree = 0},
-		[4] = {type = nil, degree = 0},
-		[5] = {type = nil, degree = 0},
-		[6] = {type = nil, degree = 0},
-		[7] = {type = nil, degree = 0},
-		[8] = {type = nil, degree = 0},
-		[9] = {type = nil, degree = 0}
+		[1] = {frame, model, x, y, type},
+		[2] = {frame, model, x, y, type},
+		[3] = {frame, model, x, y, type},
+		[4] = {frame, model, x, y, type},
+		[5] = {frame, model, x, y, type},
+		[6] = {frame, model, x, y, type},
+		[7] = {frame, model, x, y, type},
+		[8] = {frame, model, x, y, type},
+		[9] = {frame, model, x, y, type}
 	},
 	[3] = {
-		[1] = {type = nil, degree = 0},
-		[2] = {type = nil, degree = 0},
-		[3] = {type = nil, degree = 0},
-		[4] = {type = nil, degree = 0},
-		[5] = {type = nil, degree = 0},
-		[6] = {type = nil, degree = 0},
-		[7] = {type = nil, degree = 0},
-		[8] = {type = nil, degree = 0},
-		[9] = {type = nil, degree = 0}
+		[1] = {frame, model, x, y, type},
+		[2] = {frame, model, x, y, type},
+		[3] = {frame, model, x, y, type},
+		[4] = {frame, model, x, y, type},
+		[5] = {frame, model, x, y, type},
+		[6] = {frame, model, x, y, type},
+		[7] = {frame, model, x, y, type},
+		[8] = {frame, model, x, y, type},
+		[9] = {frame, model, x, y, type}
 	},
 	[4] = {
-		[1] = {type = nil, degree = 0},
-		[2] = {type = nil, degree = 0},
-		[3] = {type = nil, degree = 0},
-		[4] = {type = nil, degree = 0},
-		[5] = {type = nil, degree = 0},
-		[6] = {type = nil, degree = 0},
-		[7] = {type = nil, degree = 0},
-		[8] = {type = nil, degree = 0},
-		[9] = {type = nil, degree = 0}
+		[1] = {frame, model, x, y, type},
+		[2] = {frame, model, x, y, type},
+		[3] = {frame, model, x, y, type},
+		[4] = {frame, model, x, y, type},
+		[5] = {frame, model, x, y, type},
+		[6] = {frame, model, x, y, type},
+		[7] = {frame, model, x, y, type},
+		[8] = {frame, model, x, y, type},
+		[9] = {frame, model, x, y, type}
 	},
 	[5] = {
-		[1] = {type = nil, degree = 0},
-		[2] = {type = nil, degree = 0},
-		[3] = {type = nil, degree = 0},
-		[4] = {type = nil, degree = 0},
-		[5] = {type = nil, degree = 0},
-		[6] = {type = nil, degree = 0},
-		[7] = {type = nil, degree = 0},
-		[8] = {type = nil, degree = 0},
-		[9] = {type = nil, degree = 0}
+		[1] = {frame, model, x, y, type},
+		[2] = {frame, model, x, y, type},
+		[3] = {frame, model, x, y, type},
+		[4] = {frame, model, x, y, type},
+		[5] = {frame, model, x, y, type},
+		[6] = {frame, model, x, y, type},
+		[7] = {frame, model, x, y, type},
+		[8] = {frame, model, x, y, type},
+		[9] = {frame, model, x, y, type}
 	}
 }
 
@@ -215,6 +215,30 @@ modelslot2:SetScript("OnMouseDown", function(self, button)
 	cursortemp:SetScript("OnUpdate", OnUpdate)
 end)
 
+function CreateCursorTemp()
+	if PlantMode then
+		cursortemp:SetModel(PlantModels[CurrentPlant])
+		cursortemp:SetAlpha(1)
+		cursortemp:SetCustomCamera(1)
+		cursortemp:SetWidth(200)
+		cursortemp:SetHeight(200)
+		CurrentDegree = math.random(45)
+		cursortemp:SetRotation(math.rad(CurrentDegree))
+		SetModelTilt(cursortemp, 55)
+	elseif DestroyMode then
+		cursortemp:SetModel("World\\Generic\\goblin\\passivedoodads\\kezan\\items\\goblin_beachshovel_02.m2")
+		cursortemp:SetAlpha(1)
+		cursortemp:SetWidth(125)
+		cursortemp:SetHeight(125)
+		cursortemp:SetPosition(6.20, 0.03, 2.70)
+		cursortemp:SetRotation(math.rad(128))
+	end
+end
+
+function ClearCursorTemp()
+	cursortemp:ClearModel()
+end
+
 local temp = CreateFrame("PlayerModel", nil, frame)
 
 function CreateTemp(grid)
@@ -225,11 +249,8 @@ function CreateTemp(grid)
 		temp:SetCustomCamera(1)
 		temp:SetWidth(200)
 		temp:SetHeight(200)
-		Plants[CurrentLine][CurrentRow].degree = CurrentDegree
-		temp:SetRotation(math.rad(Plants[CurrentLine][CurrentRow].degree))
-		local x, y, z = temp:GetCameraPosition()
-		local r = math.sqrt((x * x) + (y * y) + (z * z))
-		SetModelTilt(temp, 55, x, y, z, r)
+		temp:SetRotation(math.rad(CurrentDegree))
+		SetModelTilt(temp, 55)
 	end
 end
 
@@ -247,35 +268,9 @@ function OnUpdate(self, elapsed)
 	end
 end
 
-function CreateCursorTemp()
-	if PlantMode then
-		cursortemp:SetModel(PlantModels[CurrentPlant])
-		cursortemp:SetAlpha(1)
-		cursortemp:SetCustomCamera(1)
-		cursortemp:SetWidth(200)
-		cursortemp:SetHeight(200)
-		CurrentDegree = math.random(45)
-		cursortemp:SetRotation(math.rad(CurrentDegree))
-		local x, y, z = cursortemp:GetCameraPosition()
-		local r = math.sqrt((x * x) + (y * y) + (z * z))
-		SetModelTilt(cursortemp, 55, x, y, z, r)
-	elseif DestroyMode then
-		cursortemp:SetModel("World\\Generic\\goblin\\passivedoodads\\kezan\\items\\goblin_beachshovel_02.m2")
-		cursortemp:SetAlpha(1)
-		cursortemp:SetWidth(125)
-		cursortemp:SetHeight(125)
-		cursortemp:SetPosition(6.20, 0.03, 2.70)
-		cursortemp:SetRotation(math.rad(128))
-	end
-end
-
-function ClearCursorTemp()
-	cursortemp:ClearModel()
-end
-
 local ghoulframe = CreateFrame("Frame", nil, frame)
 ghoulframe:SetFrameStrata("Medium")
-ghoulframe:SetPoint("Right", grid11, "Right", 900, 5)
+ghoulframe:SetPoint("Right", Plants[1][1].frame, "Right", 900, 5)
 ghoulframe:SetAlpha(1)
 ghoulframe:SetWidth(200)
 ghoulframe:SetHeight(200)
@@ -283,42 +278,76 @@ ghoulframe:SetHeight(200)
 local ghoulmodel = CreateFrame("PlayerModel", nil, ghoulframe)
 ghoulmodel:SetAllPoints(ghoulframe)
 
-local grid11 = CreateFrame("Frame", nil, frame)
-grid11:SetPoint("TopLeft", map, "TopLeft", 256, - 81)
-grid11:SetWidth(79)
-grid11:SetHeight(95)
-grid11:SetAlpha(1)
-grid11:SetBackdrop(backdrop)
-grid11.x = grid11:GetWidth() / 2
-grid11.y = grid11:GetHeight() / 2
+for i = 1, 1 do
+	for j = 1, 9 do
+		Plants[i][j].frame = CreateFrame("Frame", nil, frame)
+		if i == 1 and j == 1 then
+			Plants[i][j].frame:SetPoint("TopLeft", map, "TopLeft", 256, - 81)
+		else
+			Plants[i][j].frame:SetPoint("BottomLeft", Plants[i][j - 1].frame, "BottomRight", 0, 0)
+		end
+		Plants[i][j].frame:SetWidth(79)
+		if j == 1 then
+			Plants[i][j].frame:SetHeight(95)
+		elseif j == 2 then
+			Plants[i][j].frame:SetHeight(100)
+		elseif j == 3 then
+			Plants[i][j].frame:SetHeight(105)
+		elseif j == 4 then
+			Plants[i][j].frame:SetHeight(110)
+		elseif j == 5 then
+			Plants[i][j].frame:SetHeight(110)
+		elseif j == 6 then
+			Plants[i][j].frame:SetHeight(110)
+		elseif j == 7 then
+			Plants[i][j].frame:SetHeight(105)
+		elseif j == 8 then
+			Plants[i][j].frame:SetHeight(100)
+		elseif j == 9 then
+			Plants[i][j].frame:SetHeight(95)
+		end
+		Plants[i][j].frame:SetAlpha(1)
+		Plants[i][j].frame:SetBackdrop(backdrop)
+		Plants[i][j].frame.x = Plants[i][j].frame:GetWidth() / 2
+		Plants[i][j].frame.y = Plants[i][j].frame:GetHeight() / 2
+		Plants[i][j].model = CreateFrame("PlayerModel", nil, frame)
+		Plants[i][j].frame:SetScript("OnEnter", function(self)
+			OnEnter(self, i, j, Plants[i][j].model)
+		end)
+		Plants[i][j].frame:SetScript("OnLeave", function(self)
+			OnLeave(Plants[i][j].model)
+		end)
+		Plants[i][j].frame:SetScript("OnMouseDown", function(self, button)
+			OnMouseDown(self, button, Plants[i][j].model, ghoulmodel)
+		end)
+	end
+end
 
-local model11 = CreateFrame("PlayerModel", nil, frame)
-
-grid11:SetScript("OnEnter", function(self)
-	CurrentLine = 1
-	CurrentRow = 1
+function OnEnter(self, line, row, model)
 	CurrentGrid = self
+	CurrentLine = line
+	CurrentRow = row
 	if PlantMode and Plants[CurrentLine][CurrentRow].type == nil then
 		CreateTemp(self)
 	elseif DestroyMode then
-		model11:SetLight(1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1)
+		model:SetLight(1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1)
 	end
-end)
+end
 
-grid11:SetScript("OnLeave", function(self)
+function OnLeave(model)
 	if PlantMode then
 		temp:ClearModel()
 	elseif DestroyMode then
-		model11:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
+		model:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
 	end
-end)
+end
 
-grid11:SetScript("OnMouseDown", function(self, button)
+function OnMouseDown(self, button, model, ghoul)
 	if button == "LeftButton" then
 		if PlantMode then
-			CreatePlant11()
+			CreatePlant(self, model, ghoul)
 		elseif DestroyMode then
-			DestroyPlant11()
+			DestroyPlant(model)
 		end
 	else
 		if PlantMode then
@@ -326,268 +355,58 @@ grid11:SetScript("OnMouseDown", function(self, button)
 			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
 		elseif DestroyMode then
 			DisableModes()
-			model11:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
+			model:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
 			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
 		end
 	end
-end)
+end
 
-function CreatePlant11()
+function CreatePlant(grid, model, ghoul)
 	if PlantMode and Plants[CurrentLine][CurrentRow].type == nil then
 		Plants[CurrentLine][CurrentRow].type = 1
-		if GetDistance(grid11, ghoulmodel) < - 120 and GetDistance(grid11, ghoulmodel) > - 170 then
-			ghoulmodel.next = 1
+		if GetDistance(grid, ghoul) < - 120 and GetDistance(grid, ghoul) > - 170 then
+			ghoulmodel.next = CurrentRow
 		end
-		InitModel11()
+		InitModel(model, CurrentLine, CurrentRow)
 		DisableModes()
 		cursortemp:SetScript("OnUpdate", nil)
 		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\plant.ogg", "Master")
 	end
 end
 
-function DestroyPlant11()
+function InitModel(model, line, row)
+	if Plants[line][row].type ~= nil then
+		model:SetModel(PlantModels[CurrentPlant])
+		model:SetPoint("Center", Plants[line][row].frame, "TopLeft", Plants[line][row].frame.x, - Plants[line][row].frame.y)
+		model:SetAlpha(1)
+		model:SetCustomCamera(1)
+		model:SetWidth(200)
+		model:SetHeight(200)
+		model:SetRotation(math.rad(CurrentDegree))
+		SetModelTilt(model, 55)
+	end
+end
+
+function DestroyPlant(model)
 	if DestroyMode and Plants[CurrentLine][CurrentRow].type ~= nil then
 		Plants[CurrentLine][CurrentRow].type = nil
-		model11:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
-		model11:ClearModel()
+		model:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
+		model:ClearModel()
 		DisableModes()
 		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\shovel.ogg", "Master")
 	end
 end
-
-function InitModel11()
-	if Plants[1][1].type ~= nil then
-		model11:SetModel(PlantModels[CurrentPlant])
-		model11:SetPoint("Center", grid11, "TopLeft", grid11.x, - grid11.y)
-		model11:SetAlpha(1)
-		model11:SetCustomCamera(1)
-		model11:SetWidth(200)
-		model11:SetHeight(200)
-		model11:SetRotation(math.rad(Plants[1][1].degree))
-		local x, y, z = model11:GetCameraPosition()
-		local r = math.sqrt((x * x) + (y * y) + (z * z))
-		SetModelTilt(model11, 55, x, y, z, r)
-	end
-end
-
-local grid12 = CreateFrame("Frame", nil, frame)
-grid12:SetPoint("BottomLeft", grid11, "BottomRight", 0, 0)
-grid12:SetWidth(79)
-grid12:SetHeight(100)
-grid12:SetAlpha(1)
-grid12:SetBackdrop(backdrop)
-grid12.x = grid12:GetWidth() / 2
-grid12.y = grid12:GetHeight() / 2
-
-local model12 = CreateFrame("PlayerModel", nil, frame)
-
-grid12:SetScript("OnEnter", function(self)
-	CurrentLine = 1
-	CurrentRow = 2
-	CurrentGrid = self
-	if PlantMode and Plants[CurrentLine][CurrentRow].type == nil then
-		CreateTemp(self)
-	elseif DestroyMode then
-		model12:SetLight(1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1)
-	end
-end)
-
-grid12:SetScript("OnLeave", function(self)
-	if PlantMode then
-		temp:ClearModel()
-	elseif DestroyMode then
-		model12:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
-	end
-end)
-
-grid12:SetScript("OnMouseDown", function(self, button)
-	if button == "LeftButton" then
-		if PlantMode then
-			CreatePlant12()
-		elseif DestroyMode then
-			DestroyPlant12()
-		end
-	else
-		if PlantMode then
-			DisableModes()
-			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
-		elseif DestroyMode then
-			DisableModes()
-			model12:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
-			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
-		end
-	end
-end)
-
-function CreatePlant12()
-	if PlantMode and Plants[CurrentLine][CurrentRow].type == nil then
-		Plants[CurrentLine][CurrentRow].type = 1
-		if GetDistance(grid12, ghoulmodel) < - 120 and GetDistance(grid12, ghoulmodel) > - 170 then
-			ghoulmodel.next = 2
-		end
-		InitModel12()
-		DisableModes()
-		cursortemp:SetScript("OnUpdate", nil)
-		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\plant.ogg", "Master")
-	end
-end
-
-function DestroyPlant12()
-	if DestroyMode and Plants[CurrentLine][CurrentRow].type ~= nil then
-		Plants[CurrentLine][CurrentRow].type = nil
-		model12:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
-		model12:ClearModel()
-		DisableModes()
-		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\shovel.ogg", "Master")
-	end
-end
-
-function InitModel12()
-	if Plants[1][2].type ~= nil then
-		model12:SetModel(PlantModels[CurrentPlant])
-		model12:SetPoint("Center", grid12, "TopLeft", grid12.x, - grid12.y)
-		model12:SetAlpha(1)
-		model12:SetCustomCamera(1)
-		model12:SetWidth(200)
-		model12:SetHeight(200)
-		model12:SetRotation(math.rad(Plants[1][2].degree))
-		local x, y, z = model12:GetCameraPosition()
-		local r = math.sqrt((x * x) + (y * y) + (z * z))
-		SetModelTilt(model12, 55, x, y, z, r)
-	end
-end
-
-local grid13 = CreateFrame("Frame", nil, frame)
-grid13:SetPoint("BottomLeft", grid12, "BottomRight", 0, 0)
-grid13:SetWidth(79)
-grid13:SetHeight(105)
-grid13:SetAlpha(1)
-grid13:SetBackdrop(backdrop)
-grid13.x = grid13:GetWidth() / 2
-grid13.y = grid13:GetHeight() / 2
-
-local model13 = CreateFrame("PlayerModel", nil, frame)
-
-grid13:SetScript("OnEnter", function(self)
-	CurrentLine = 1
-	CurrentRow = 3
-	CurrentGrid = self
-	if PlantMode and Plants[CurrentLine][CurrentRow].type == nil then
-		CreateTemp(self)
-	elseif DestroyMode then
-		model13:SetLight(1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1)
-	end
-end)
-
-grid13:SetScript("OnLeave", function(self)
-	if PlantMode then
-		temp:ClearModel()
-	elseif DestroyMode then
-		model13:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
-	end
-end)
-
-grid13:SetScript("OnMouseDown", function(self, button)
-	if button == "LeftButton" then
-		if PlantMode then
-			CreatePlant13()
-		elseif DestroyMode then
-			DestroyPlant13()
-		end
-	else
-		if PlantMode then
-			DisableModes()
-			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
-		elseif DestroyMode then
-			DisableModes()
-			model13:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
-			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
-		end
-	end
-end)
-
-function CreatePlant13()
-	if PlantMode and Plants[CurrentLine][CurrentRow].type == nil then
-		Plants[CurrentLine][CurrentRow].type = 1
-		InitModel13()
-		if GetDistance(grid13, ghoulmodel) < - 120 and GetDistance(grid13, ghoulmodel) > - 170 then
-			ghoulmodel.next = 3
-		end
-		DisableModes()
-		cursortemp:SetScript("OnUpdate", nil)
-		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\plant.ogg", "Master")
-	end
-end
-
-function DestroyPlant13()
-	if DestroyMode and Plants[CurrentLine][CurrentRow].type ~= nil then
-		Plants[CurrentLine][CurrentRow].type = nil
-		model13:SetLight(1, 0, 0, 1, 0, 1, 0.69999998807907, 0.69999998807907, 0.69999998807907, 1, 0.80000001192093, 0.80000001192093, 0.63999998569489)
-		model13:ClearModel()
-		DisableModes()
-		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\shovel.ogg", "Master")
-	end
-end
-
-function InitModel13()
-	if Plants[1][3].type ~= nil then
-		model13:SetModel(PlantModels[CurrentPlant])
-		model13:SetPoint("Center", grid13, "TopLeft", grid13.x, - grid13.y)
-		model13:SetAlpha(1)
-		model13:SetCustomCamera(1)
-		model13:SetWidth(200)
-		model13:SetHeight(200)
-		model13:SetRotation(math.rad(Plants[1][3].degree))
-		local x, y, z = model13:GetCameraPosition()
-		local r = math.sqrt((x * x) + (y * y) + (z * z))
-		SetModelTilt(model13, 55, x, y, z, r)
-	end
-end
-
-local grid14 = CreateFrame("Frame", nil, frame)
-grid14:SetPoint("BottomLeft", grid13, "BottomRight", 0, 0)
-grid14:SetWidth(83)
-grid14:SetHeight(110)
-grid14:SetAlpha(1)
-grid14:SetBackdrop(backdrop)
-
-local grid15 = CreateFrame("Frame", nil, frame)
-grid15:SetPoint("BottomLeft", grid14, "BottomRight", 0, 0)
-grid15:SetWidth(79)
-grid15:SetHeight(110)
-grid15:SetAlpha(1)
-grid15:SetBackdrop(backdrop)
-
-local grid16 = CreateFrame("Frame", nil, frame)
-grid16:SetPoint("BottomLeft", grid15, "BottomRight", 0, 0)
-grid16:SetWidth(83)
-grid16:SetHeight(110)
-grid16:SetAlpha(1)
-grid16:SetBackdrop(backdrop)
-
-local grid17 = CreateFrame("Frame", nil, frame)
-grid17:SetPoint("BottomLeft", grid16, "BottomRight", 0, 0)
-grid17:SetWidth(79)
-grid17:SetHeight(105)
-grid17:SetAlpha(1)
-grid17:SetBackdrop(backdrop)
-
-local grid18 = CreateFrame("Frame", nil, frame)
-grid18:SetPoint("BottomLeft", grid17, "BottomRight", 0, 0)
-grid18:SetWidth(79)
-grid18:SetHeight(100)
-grid18:SetAlpha(1)
-grid18:SetBackdrop(backdrop)
-
-local grid19 = CreateFrame("Frame", nil, frame)
-grid19:SetPoint("BottomLeft", grid18, "BottomRight", 0, 0)
-grid19:SetWidth(79)
-grid19:SetHeight(95)
-grid19:SetAlpha(1)
-grid19:SetBackdrop(backdrop)
 
 function SetModelColorFrozen(model)
 	model:SetLight(1, 0, 0, 1, 0, 1, 0.3, 0.3, 1, 1, 0.3, 0.3, 1)
+end
+
+function GetNextPlant(model, x)
+	for i = 1, x do
+		if Plants[model.line][i].type ~= nil then
+			model.next = i
+		end
+	end
 end
 
 function ChangeModelsAnimation(model, anim)
@@ -597,12 +416,24 @@ function ChangeModelsAnimation(model, anim)
 			elapsed = elapsed + (elaps * 600)
 			model:SetSequenceTime(anim, elapsed)
 			if anim == 5 then
-				ghoulframe:SetPoint("Right", grid11, "Right", model.pos, 5)
-				if (GetDistance(grid13, model) < - 120 and GetDistance(grid13, model) > - 170 and Plants[1][3].type ~= nil) then
+				ghoulframe:SetPoint("Right", Plants[1][1].frame, "Right", model.pos, 5)
+				if GetDistance(Plants[1][9].frame, model) > - 170 and GetDistance(Plants[1][9].frame, model) < - 120 and Plants[1][9].type ~= nil then
 					ChangeModelsAnimation(model, 61)
-				elseif (GetDistance(grid12, model) < - 120 and GetDistance(grid12, model) > - 170 and Plants[1][2].type ~= nil) then
+				elseif GetDistance(Plants[1][8].frame, model) > - 170 and GetDistance(Plants[1][8].frame, model) < - 120 and Plants[1][8].type ~= nil then
 					ChangeModelsAnimation(model, 61)
-				elseif (GetDistance(grid11, model) < - 120 and GetDistance(grid11, model) > - 170 and Plants[1][1].type ~= nil) then
+				elseif GetDistance(Plants[1][7].frame, model)  >- 170 and GetDistance(Plants[1][7].frame, model) < - 120 and Plants[1][7].type ~= nil then
+					ChangeModelsAnimation(model, 61)
+				elseif GetDistance(Plants[1][6].frame, model) > - 170 and GetDistance(Plants[1][6].frame, model)  <- 120 and Plants[1][6].type ~= nil then
+					ChangeModelsAnimation(model, 61)
+				elseif GetDistance(Plants[1][5].frame, model) > - 170 and GetDistance(Plants[1][5].frame, model) < - 120 and Plants[1][5].type ~= nil then
+					ChangeModelsAnimation(model, 61)
+				elseif GetDistance(Plants[1][4].frame, model) > - 170 and GetDistance(Plants[1][4].frame, model) < - 120 and Plants[1][4].type ~= nil then
+					ChangeModelsAnimation(model, 61)
+				elseif GetDistance(Plants[1][3].frame, model) > - 170 and GetDistance(Plants[1][3].frame, model) < - 120 and Plants[1][3].type ~= nil then
+					ChangeModelsAnimation(model, 61)
+				elseif GetDistance(Plants[1][2].frame, model) > - 170 and GetDistance(Plants[1][2].frame, model) < - 120 and Plants[1][2].type ~= nil then
+					ChangeModelsAnimation(model, 61)
+				elseif GetDistance(Plants[1][1].frame, model) > - 170 and GetDistance(Plants[1][1].frame, model) < - 120 and Plants[1][1].type ~= nil then
 					ChangeModelsAnimation(model, 61)
 				end
 				if model.pos > - 30 then
@@ -612,27 +443,24 @@ function ChangeModelsAnimation(model, anim)
 				end
 			elseif anim == 61 then
 				if Plants[model.line][model.next].type == nil then
-					ChangeModelsAnimation(model, 5)
-					--[[if GetDistance(grid19, model) > - 170 then
-						model.next = 8
-					elseif GetDistance(grid18, model) > - 170 then
-						model.next = 7
-					elseif GetDistance(grid17, model) > - 170 then
-						model.next = 6
-					elseif GetDistance(grid16, model) > - 170 then
-						model.next = 5
-					elseif GetDistance(grid15, model) > - 170 then
-						model.next = 4
-					elseif GetDistance(grid14, model) > - 170 then
-						model.next = 3
-					else]]
-					if GetDistance(grid13, model) > - 170 then
-						model.next = 2
-					elseif GetDistance(grid12, model) > - 170 then
-						model.next = 1
-					elseif GetDistance(grid11, model) > - 170 then
-						model.next = 0
+					if GetDistance(Plants[1][2].frame, model) < - 170 then
+						GetNextPlant(model, 1)
+					elseif GetDistance(Plants[1][3].frame, model) < - 170 then
+						GetNextPlant(model, 2)
+					elseif GetDistance(Plants[1][4].frame, model) < - 170 then
+						GetNextPlant(model, 3)
+					elseif GetDistance(Plants[1][5].frame, model) < - 170 then
+						GetNextPlant(model, 4)
+					elseif GetDistance(Plants[1][6].frame, model) < - 170 then
+						GetNextPlant(model, 5)
+					elseif GetDistance(Plants[1][7].frame, model) < - 170 then
+						GetNextPlant(model, 6)
+					elseif GetDistance(Plants[1][8].frame, model) < - 170 then
+						GetNextPlant(model, 7)
+					elseif GetDistance(Plants[1][9].frame, model) < - 170 then
+						GetNextPlant(model, 8)
 					end
+					ChangeModelsAnimation(model, 5)
 				end
 			end
 		end)
@@ -643,7 +471,7 @@ function InitModelGhoul(line)
 	ghoulmodel.line = line
 	ghoulmodel:SetDisplayInfo(137)
 	ghoulmodel.pos = 900
-	ghoulmodel.next = 3
+	ghoulmodel.next = 9
 	ghoulmodel:SetAlpha(1)
 	ghoulmodel:SetCustomCamera(1)
 	ghoulmodel:SetWidth(200)
@@ -680,8 +508,10 @@ function SetOrientation(model, distance, yaw, pitch)
 	end
 end
 
-function SetModelTilt(model, tiltdegree, x, y, z, r)
+function SetModelTilt(model, tiltdegree)
 	if model:HasCustomCamera() then
+		local x, y, z = model:GetCameraPosition()
+		local r = math.sqrt((x * x) + (y * y) + (z * z))
 		local xx = math.sin(math.rad(tiltdegree)) * r
 		local zz = math.cos(math.rad(tiltdegree)) * r
 		if xx > 0.1 then
@@ -707,9 +537,15 @@ function InitAll()
 	InitModelSlot0()
 	InitModelSlot1()
 	InitModelSlot2()
-	InitModel11()
-	InitModel12()
-	InitModel13()
+	InitModel(Plants[1][1].model, 1, 1)
+	InitModel(Plants[1][2].model, 1, 2)
+	InitModel(Plants[1][3].model, 1, 3)
+	InitModel(Plants[1][4].model, 1, 4)
+	InitModel(Plants[1][5].model, 1, 5)
+	InitModel(Plants[1][6].model, 1, 6)
+	InitModel(Plants[1][7].model, 1, 7)
+	InitModel(Plants[1][8].model, 1, 8)
+	InitModel(Plants[1][9].model, 1, 9)
 	InitModelGhoul(1)
 end
 
