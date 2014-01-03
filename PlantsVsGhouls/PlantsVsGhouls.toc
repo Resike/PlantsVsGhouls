@@ -1,0 +1,10 @@
+﻿## Interface: 50400
+## Title: Plants Vs Ghouls
+## Version: 1.0.0
+## Author: Resike
+## Notes: Plants versus Ghouls!
+## DefaultState: Enabled
+## SavedVariables: 
+## SavedVariablesPerCharacter: 
+
+PlantsVsGhouls.lua
