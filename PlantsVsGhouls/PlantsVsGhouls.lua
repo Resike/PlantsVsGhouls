@@ -13,59 +13,59 @@ mainframe:Hide()
 
 local Plants = {
 	[1] = {
-		[1] = {frame, model, x, y, type},
-		[2] = {frame, model, x, y, type},
-		[3] = {frame, model, x, y, type},
-		[4] = {frame, model, x, y, type},
-		[5] = {frame, model, x, y, type},
-		[6] = {frame, model, x, y, type},
-		[7] = {frame, model, x, y, type},
-		[8] = {frame, model, x, y, type},
-		[9] = {frame, model, x, y, type}
+		[1] = {frame, model, x, y, type, degree},
+		[2] = {frame, model, x, y, type, degree},
+		[3] = {frame, model, x, y, type, degree},
+		[4] = {frame, model, x, y, type, degree},
+		[5] = {frame, model, x, y, type, degree},
+		[6] = {frame, model, x, y, type, degree},
+		[7] = {frame, model, x, y, type, degree},
+		[8] = {frame, model, x, y, type, degree},
+		[9] = {frame, model, x, y, type, degree}
 	},
 	[2] = {
-		[1] = {frame, model, x, y, type},
-		[2] = {frame, model, x, y, type},
-		[3] = {frame, model, x, y, type},
-		[4] = {frame, model, x, y, type},
-		[5] = {frame, model, x, y, type},
-		[6] = {frame, model, x, y, type},
-		[7] = {frame, model, x, y, type},
-		[8] = {frame, model, x, y, type},
-		[9] = {frame, model, x, y, type}
+		[1] = {frame, model, x, y, type, degree},
+		[2] = {frame, model, x, y, type, degree},
+		[3] = {frame, model, x, y, type, degree},
+		[4] = {frame, model, x, y, type, degree},
+		[5] = {frame, model, x, y, type, degree},
+		[6] = {frame, model, x, y, type, degree},
+		[7] = {frame, model, x, y, type, degree},
+		[8] = {frame, model, x, y, type, degree},
+		[9] = {frame, model, x, y, type, degree}
 	},
 	[3] = {
-		[1] = {frame, model, x, y, type},
-		[2] = {frame, model, x, y, type},
-		[3] = {frame, model, x, y, type},
-		[4] = {frame, model, x, y, type},
-		[5] = {frame, model, x, y, type},
-		[6] = {frame, model, x, y, type},
-		[7] = {frame, model, x, y, type},
-		[8] = {frame, model, x, y, type},
-		[9] = {frame, model, x, y, type}
+		[1] = {frame, model, x, y, type, degree},
+		[2] = {frame, model, x, y, type, degree},
+		[3] = {frame, model, x, y, type, degree},
+		[4] = {frame, model, x, y, type, degree},
+		[5] = {frame, model, x, y, type, degree},
+		[6] = {frame, model, x, y, type, degree},
+		[7] = {frame, model, x, y, type, degree},
+		[8] = {frame, model, x, y, type, degree},
+		[9] = {frame, model, x, y, type, degree}
 	},
 	[4] = {
-		[1] = {frame, model, x, y, type},
-		[2] = {frame, model, x, y, type},
-		[3] = {frame, model, x, y, type},
-		[4] = {frame, model, x, y, type},
-		[5] = {frame, model, x, y, type},
-		[6] = {frame, model, x, y, type},
-		[7] = {frame, model, x, y, type},
-		[8] = {frame, model, x, y, type},
-		[9] = {frame, model, x, y, type}
+		[1] = {frame, model, x, y, type, degree},
+		[2] = {frame, model, x, y, type, degree},
+		[3] = {frame, model, x, y, type, degree},
+		[4] = {frame, model, x, y, type, degree},
+		[5] = {frame, model, x, y, type, degree},
+		[6] = {frame, model, x, y, type, degree},
+		[7] = {frame, model, x, y, type, degree},
+		[8] = {frame, model, x, y, type, degree},
+		[9] = {frame, model, x, y, type, degree}
 	},
 	[5] = {
-		[1] = {frame, model, x, y, type},
-		[2] = {frame, model, x, y, type},
-		[3] = {frame, model, x, y, type},
-		[4] = {frame, model, x, y, type},
-		[5] = {frame, model, x, y, type},
-		[6] = {frame, model, x, y, type},
-		[7] = {frame, model, x, y, type},
-		[8] = {frame, model, x, y, type},
-		[9] = {frame, model, x, y, type}
+		[1] = {frame, model, x, y, type, degree},
+		[2] = {frame, model, x, y, type, degree},
+		[3] = {frame, model, x, y, type, degree},
+		[4] = {frame, model, x, y, type, degree},
+		[5] = {frame, model, x, y, type, degree},
+		[6] = {frame, model, x, y, type, degree},
+		[7] = {frame, model, x, y, type, degree},
+		[8] = {frame, model, x, y, type, degree},
+		[9] = {frame, model, x, y, type, degree}
 	}
 }
 
@@ -249,7 +249,8 @@ function CreateTemp(grid)
 		temp:SetCustomCamera(1)
 		temp:SetWidth(200)
 		temp:SetHeight(200)
-		temp:SetRotation(math.rad(CurrentDegree))
+		Plants[CurrentLine][CurrentRow].degree = CurrentDegree
+		temp:SetRotation(math.rad(Plants[CurrentLine][CurrentRow].degree))
 		SetModelTilt(temp, 55)
 	end
 end
@@ -278,15 +279,17 @@ ghoulframe:SetHeight(200)
 local ghoulmodel = CreateFrame("PlayerModel", nil, ghoulframe)
 ghoulmodel:SetAllPoints(ghoulframe)
 
-for i = 1, 1 do
+for i = 1, 5 do
 	for j = 1, 9 do
 		Plants[i][j].frame = CreateFrame("Frame", nil, frame)
 		if i == 1 and j == 1 then
 			Plants[i][j].frame:SetPoint("TopLeft", map, "TopLeft", 256, - 81)
+		elseif (i == 2 and j == 1) or (i == 3 and j == 1) or (i == 4 and j == 1) or (i == 5 and j == 1) then
+			Plants[i][j].frame:SetPoint("Top", Plants[i - 1][j].frame, "Bottom", 0, 0)
 		else
 			Plants[i][j].frame:SetPoint("BottomLeft", Plants[i][j - 1].frame, "BottomRight", 0, 0)
 		end
-		Plants[i][j].frame:SetWidth(79)
+		Plants[i][j].frame:SetWidth(80)
 		if i == 1 then
 			if j == 1 then
 				Plants[i][j].frame:SetHeight(95)
@@ -307,6 +310,8 @@ for i = 1, 1 do
 			elseif j == 9 then
 				Plants[i][j].frame:SetHeight(95)
 			end
+		else
+			Plants[i][j].frame:SetHeight(98)
 		end
 		Plants[i][j].frame:SetAlpha(1)
 		Plants[i][j].frame:SetBackdrop(backdrop)
@@ -384,7 +389,7 @@ function InitModel(model, line, row)
 		model:SetCustomCamera(1)
 		model:SetWidth(200)
 		model:SetHeight(200)
-		model:SetRotation(math.rad(CurrentDegree))
+		model:SetRotation(math.rad(Plants[line][row].degree))
 		SetModelTilt(model, 55)
 	end
 end
@@ -423,9 +428,9 @@ function ChangeModelsAnimation(model, anim)
 					ChangeModelsAnimation(model, 61)
 				elseif GetDistance(Plants[1][8].frame, model) > - 170 and GetDistance(Plants[1][8].frame, model) < - 120 and Plants[1][8].type ~= nil then
 					ChangeModelsAnimation(model, 61)
-				elseif GetDistance(Plants[1][7].frame, model)  >- 170 and GetDistance(Plants[1][7].frame, model) < - 120 and Plants[1][7].type ~= nil then
+				elseif GetDistance(Plants[1][7].frame, model) > - 170 and GetDistance(Plants[1][7].frame, model) < - 120 and Plants[1][7].type ~= nil then
 					ChangeModelsAnimation(model, 61)
-				elseif GetDistance(Plants[1][6].frame, model) > - 170 and GetDistance(Plants[1][6].frame, model)  <- 120 and Plants[1][6].type ~= nil then
+				elseif GetDistance(Plants[1][6].frame, model) > - 170 and GetDistance(Plants[1][6].frame, model) < - 120 and Plants[1][6].type ~= nil then
 					ChangeModelsAnimation(model, 61)
 				elseif GetDistance(Plants[1][5].frame, model) > - 170 and GetDistance(Plants[1][5].frame, model) < - 120 and Plants[1][5].type ~= nil then
 					ChangeModelsAnimation(model, 61)
@@ -539,7 +544,7 @@ function InitAll()
 	InitModelSlot0()
 	InitModelSlot1()
 	InitModelSlot2()
-	for i = 1, 1 do
+	for i = 1, 5 do
 		for j = 1, 9 do
 			InitModel(Plants[i][j].model, i, j)
 		end
