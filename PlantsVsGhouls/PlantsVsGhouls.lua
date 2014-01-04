@@ -13,59 +13,59 @@ mainframe:Hide()
 
 local Plants = {
 	[1] = {
-		[1] = {frame, model, x, y, type, degree},
-		[2] = {frame, model, x, y, type, degree},
-		[3] = {frame, model, x, y, type, degree},
-		[4] = {frame, model, x, y, type, degree},
-		[5] = {frame, model, x, y, type, degree},
-		[6] = {frame, model, x, y, type, degree},
-		[7] = {frame, model, x, y, type, degree},
-		[8] = {frame, model, x, y, type, degree},
-		[9] = {frame, model, x, y, type, degree}
+		[1] = {frame, model, x, y, type, health, degree},
+		[2] = {frame, model, x, y, type, health, degree},
+		[3] = {frame, model, x, y, type, health, degree},
+		[4] = {frame, model, x, y, type, health, degree},
+		[5] = {frame, model, x, y, type, health, degree},
+		[6] = {frame, model, x, y, type, health, degree},
+		[7] = {frame, model, x, y, type, health, degree},
+		[8] = {frame, model, x, y, type, health, degree},
+		[9] = {frame, model, x, y, type, health, degree}
 	},
 	[2] = {
-		[1] = {frame, model, x, y, type, degree},
-		[2] = {frame, model, x, y, type, degree},
-		[3] = {frame, model, x, y, type, degree},
-		[4] = {frame, model, x, y, type, degree},
-		[5] = {frame, model, x, y, type, degree},
-		[6] = {frame, model, x, y, type, degree},
-		[7] = {frame, model, x, y, type, degree},
-		[8] = {frame, model, x, y, type, degree},
-		[9] = {frame, model, x, y, type, degree}
+		[1] = {frame, model, x, y, type, health, degree},
+		[2] = {frame, model, x, y, type, health, degree},
+		[3] = {frame, model, x, y, type, health, degree},
+		[4] = {frame, model, x, y, type, health, degree},
+		[5] = {frame, model, x, y, type, health, degree},
+		[6] = {frame, model, x, y, type, health, degree},
+		[7] = {frame, model, x, y, type, health, degree},
+		[8] = {frame, model, x, y, type, health, degree},
+		[9] = {frame, model, x, y, type, health, degree}
 	},
 	[3] = {
-		[1] = {frame, model, x, y, type, degree},
-		[2] = {frame, model, x, y, type, degree},
-		[3] = {frame, model, x, y, type, degree},
-		[4] = {frame, model, x, y, type, degree},
-		[5] = {frame, model, x, y, type, degree},
-		[6] = {frame, model, x, y, type, degree},
-		[7] = {frame, model, x, y, type, degree},
-		[8] = {frame, model, x, y, type, degree},
-		[9] = {frame, model, x, y, type, degree}
+		[1] = {frame, model, x, y, type, health, degree},
+		[2] = {frame, model, x, y, type, health, degree},
+		[3] = {frame, model, x, y, type, health, degree},
+		[4] = {frame, model, x, y, type, health, degree},
+		[5] = {frame, model, x, y, type, health, degree},
+		[6] = {frame, model, x, y, type, health, degree},
+		[7] = {frame, model, x, y, type, health, degree},
+		[8] = {frame, model, x, y, type, health, degree},
+		[9] = {frame, model, x, y, type, health, degree}
 	},
 	[4] = {
-		[1] = {frame, model, x, y, type, degree},
-		[2] = {frame, model, x, y, type, degree},
-		[3] = {frame, model, x, y, type, degree},
-		[4] = {frame, model, x, y, type, degree},
-		[5] = {frame, model, x, y, type, degree},
-		[6] = {frame, model, x, y, type, degree},
-		[7] = {frame, model, x, y, type, degree},
-		[8] = {frame, model, x, y, type, degree},
-		[9] = {frame, model, x, y, type, degree}
+		[1] = {frame, model, x, y, type, health, degree},
+		[2] = {frame, model, x, y, type, health, degree},
+		[3] = {frame, model, x, y, type, health, degree},
+		[4] = {frame, model, x, y, type, health, degree},
+		[5] = {frame, model, x, y, type, health, degree},
+		[6] = {frame, model, x, y, type, health, degree},
+		[7] = {frame, model, x, y, type, health, degree},
+		[8] = {frame, model, x, y, type, health, degree},
+		[9] = {frame, model, x, y, type, health, degree}
 	},
 	[5] = {
-		[1] = {frame, model, x, y, type, degree},
-		[2] = {frame, model, x, y, type, degree},
-		[3] = {frame, model, x, y, type, degree},
-		[4] = {frame, model, x, y, type, degree},
-		[5] = {frame, model, x, y, type, degree},
-		[6] = {frame, model, x, y, type, degree},
-		[7] = {frame, model, x, y, type, degree},
-		[8] = {frame, model, x, y, type, degree},
-		[9] = {frame, model, x, y, type, degree}
+		[1] = {frame, model, x, y, type, health, degree},
+		[2] = {frame, model, x, y, type, health, degree},
+		[3] = {frame, model, x, y, type, health, degree},
+		[4] = {frame, model, x, y, type, health, degree},
+		[5] = {frame, model, x, y, type, health, degree},
+		[6] = {frame, model, x, y, type, health, degree},
+		[7] = {frame, model, x, y, type, health, degree},
+		[8] = {frame, model, x, y, type, health, degree},
+		[9] = {frame, model, x, y, type, health, degree}
 	}
 }
 
@@ -74,7 +74,7 @@ local Ghouls = {
 }
 
 local PlantModels = {
-	[1] = "Creature\\LasherSunflower\\lasher_sunflower.m2"
+	[1] = {model = "Creature\\LasherSunflower\\lasher_sunflower.m2", health = 100}
 }
 
 local CurrentLine = nil
@@ -217,7 +217,7 @@ end)
 
 function CreateCursorTemp()
 	if PlantMode then
-		cursortemp:SetModel(PlantModels[CurrentPlant])
+		cursortemp:SetModel(PlantModels[CurrentPlant].model)
 		cursortemp:SetAlpha(1)
 		cursortemp:SetCustomCamera(1)
 		cursortemp:SetWidth(200)
@@ -243,7 +243,7 @@ local temp = CreateFrame("PlayerModel", nil, frame)
 
 function CreateTemp(grid)
 	if PlantMode and Plants[CurrentLine][CurrentRow].type == nil then
-		temp:SetModel(PlantModels[CurrentPlant])
+		temp:SetModel(PlantModels[CurrentPlant].model)
 		temp:SetPoint("Center", grid, "TopLeft", grid.x, - grid.y)
 		temp:SetAlpha(0.7)
 		temp:SetCustomCamera(1)
@@ -354,7 +354,7 @@ function OnMouseDown(self, button, model, ghoul)
 		if PlantMode then
 			CreatePlant(self, model, ghoul)
 		elseif DestroyMode then
-			DestroyPlant(model)
+			DestroyPlant(model, CurrentLine, CurrentRow)
 		end
 	else
 		if PlantMode then
@@ -370,7 +370,8 @@ end
 
 function CreatePlant(grid, model, ghoul)
 	if PlantMode and Plants[CurrentLine][CurrentRow].type == nil then
-		Plants[CurrentLine][CurrentRow].type = 1
+		Plants[CurrentLine][CurrentRow].type = CurrentPlant
+		Plants[CurrentLine][CurrentRow].health = PlantModels[CurrentPlant].health
 		if GetDistance(grid, ghoul) < - 120 and GetDistance(grid, ghoul) > - 170 then
 			ghoulmodel.next = CurrentRow
 		end
@@ -383,7 +384,7 @@ end
 
 function InitModel(model, line, row)
 	if Plants[line][row].type ~= nil then
-		model:SetModel(PlantModels[CurrentPlant])
+		model:SetModel(PlantModels[CurrentPlant].model)
 		model:SetPoint("Center", Plants[line][row].frame, "TopLeft", Plants[line][row].frame.x, - Plants[line][row].frame.y)
 		model:SetAlpha(1)
 		model:SetCustomCamera(1)
@@ -394,13 +395,18 @@ function InitModel(model, line, row)
 	end
 end
 
-function DestroyPlant(model)
-	if DestroyMode and Plants[CurrentLine][CurrentRow].type ~= nil then
-		Plants[CurrentLine][CurrentRow].type = nil
+function DestroyPlant(model, line, row, kill)
+	if Plants[line][row].type ~= nil then
+		Plants[line][row].type = nil
+		Plants[line][row].health = nil
 		model:SetLight(1, 0, 0, 1, 0, 1, 0.7, 0.7, 0.7, 1, 0.8, 0.8, 0.64)
 		model:ClearModel()
-		DisableModes()
-		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\shovel.ogg", "Master")
+		if kill then
+			--PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\gulp.ogg", "Master")
+		else
+			DisableModes()
+			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\shovel.ogg", "Master")
+		end
 	end
 end
 
@@ -419,6 +425,7 @@ end
 function ChangeModelsAnimation(model, anim)
 	if anim and anim > - 1 and anim < 802 then
 		local elapsed = 0
+		local time = 0
 		model:SetScript("OnUpdate", function(self, elaps)
 			elapsed = elapsed + (elaps * 600)
 			model:SetSequenceTime(anim, elapsed)
@@ -449,6 +456,22 @@ function ChangeModelsAnimation(model, anim)
 					model:SetScript("OnUpdate", nil)
 				end
 			elseif anim == 61 then
+				time = time + (elaps * 1000)
+				if time > 1000 and Plants[model.line][model.next].health then
+					time = 0
+					if Plants[model.line][model.next].health > 0 then
+						Plants[model.line][model.next].health = Plants[model.line][model.next].health - 34
+						local r = math.random(3)
+						if r == 1 then
+							r = ""
+						elseif r == 3 then
+							r = "soft"
+						end
+						PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\chomp"..r..".ogg", "Master")
+					else
+						DestroyPlant(Plants[model.line][model.next].model, model.line, model.next, true)
+					end
+				end
 				if Plants[model.line][model.next].type == nil then
 					if GetDistance(Plants[1][2].frame, model) < - 170 then
 						GetNextPlant(model, 1)
@@ -484,8 +507,6 @@ function InitModelGhoul(line)
 	ghoulmodel:SetWidth(200)
 	ghoulmodel:SetHeight(200)
 	ghoulmodel:SetRotation(math.rad(0))
-	local x, y, z = ghoulmodel:GetCameraPosition()
-	local r = math.sqrt((x * x) + (y * y) + (z * z))
 	SetOrientation(ghoulmodel, 4.5772, - 1.5346, - 0.9802)
 	ChangeModelsAnimation(ghoulmodel, 5)
 end
