@@ -69,6 +69,10 @@ local Plants = {
 	}
 }
 
+local PlantTypes = {
+	[1] = {model = "Creature\\LasherSunflower\\lasher_sunflower.m2", health = 100}
+}
+
 local Ghouls = {
 	[1] = {frame, model},
 	[2] = {frame, model},
@@ -77,8 +81,11 @@ local Ghouls = {
 	[5] = {frame, model}
 }
 
-local PlantTypes = {
-	[1] = {model = "Creature\\LasherSunflower\\lasher_sunflower.m2", health = 100}
+local GhoulTypes = {
+	-- Vanilla ghoul
+	[1] = {model = {[1] = 137, [2] = 414, [3] = 519, [4] = 547}, distance = 4.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 170, endpos = - 120, stoppos = - 30, speed = 0.3, damage = 34, health = 100},
+	-- Burning Crusade ghoul
+	[2] = {model = {[1] = 24992, [2] = 24993, [3] = 24994, [4] = 24995}, distance = 5.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 41, health = 150}
 }
 
 local CurrentLine = nil
@@ -225,8 +232,8 @@ function CreateCursorTemp()
 		cursortemp:SetModel(PlantTypes[CurrentPlant].model)
 		cursortemp:SetAlpha(1)
 		cursortemp:SetCustomCamera(1)
-		CurrentDegree = math.random(45)
-		CurrentSize = 200 + math.random(30)
+		CurrentDegree = math.random(0, 45)
+		CurrentSize = 200 + math.random(0, 30)
 		cursortemp:SetWidth(CurrentSize)
 		cursortemp:SetHeight(CurrentSize)
 		cursortemp:SetRotation(math.rad(CurrentDegree))
@@ -279,7 +286,7 @@ end
 for i = 1, 5 do
 	Ghouls[i].frame = CreateFrame("Frame", nil, frame)
 	Ghouls[i].frame:SetFrameStrata("High")
-	Ghouls[i].frame:SetPoint("Right", Plants[1][1].frame, "Right", 900, 5)
+	Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", 900, 5)
 	Ghouls[i].frame:SetAlpha(1)
 	Ghouls[i].frame:SetWidth(200)
 	Ghouls[i].frame:SetHeight(200)
@@ -452,27 +459,27 @@ function ChangeModelsAnimation(model, anim)
 			model:SetSequenceTime(anim, elapsed)
 			if anim == 5 then
 				Ghouls[model.line].frame:SetPoint("Right", Plants[model.line][1].frame, "Right", model.pos, 5)
-				if GetDistance(Plants[model.line][9].frame, model) > - 170 and GetDistance(Plants[model.line][9].frame, model) < - 120 and Plants[model.line][9].model.type ~= nil then
+				if GetDistance(Plants[model.line][9].frame, model) > model.startpos and GetDistance(Plants[model.line][9].frame, model) < model.endpos and Plants[model.line][9].model.type ~= nil then
 					ChangeModelsAnimation(model, 61)
-				elseif GetDistance(Plants[model.line][8].frame, model) > - 170 and GetDistance(Plants[model.line][8].frame, model) < - 120 and Plants[model.line][8].model.type ~= nil then
+				elseif GetDistance(Plants[model.line][8].frame, model) > model.startpos and GetDistance(Plants[model.line][8].frame, model) < model.endpos and Plants[model.line][8].model.type ~= nil then
 					ChangeModelsAnimation(model, 61)
-				elseif GetDistance(Plants[model.line][7].frame, model) > - 170 and GetDistance(Plants[model.line][7].frame, model) < - 120 and Plants[model.line][7].model.type ~= nil then
+				elseif GetDistance(Plants[model.line][7].frame, model) > model.startpos and GetDistance(Plants[model.line][7].frame, model) < model.endpos and Plants[model.line][7].model.type ~= nil then
 					ChangeModelsAnimation(model, 61)
-				elseif GetDistance(Plants[model.line][6].frame, model) > - 170 and GetDistance(Plants[model.line][6].frame, model) < - 120 and Plants[model.line][6].model.type ~= nil then
+				elseif GetDistance(Plants[model.line][6].frame, model) > model.startpos and GetDistance(Plants[model.line][6].frame, model) < model.endpos and Plants[model.line][6].model.type ~= nil then
 					ChangeModelsAnimation(model, 61)
-				elseif GetDistance(Plants[model.line][5].frame, model) > - 170 and GetDistance(Plants[model.line][5].frame, model) < - 120 and Plants[model.line][5].model.type ~= nil then
+				elseif GetDistance(Plants[model.line][5].frame, model) > model.startpos and GetDistance(Plants[model.line][5].frame, model) < model.endpos and Plants[model.line][5].model.type ~= nil then
 					ChangeModelsAnimation(model, 61)
-				elseif GetDistance(Plants[model.line][4].frame, model) > - 170 and GetDistance(Plants[model.line][4].frame, model) < - 120 and Plants[model.line][4].model.type ~= nil then
+				elseif GetDistance(Plants[model.line][4].frame, model) > model.startpos and GetDistance(Plants[model.line][4].frame, model) < model.endpos and Plants[model.line][4].model.type ~= nil then
 					ChangeModelsAnimation(model, 61)
-				elseif GetDistance(Plants[model.line][3].frame, model) > - 170 and GetDistance(Plants[model.line][3].frame, model) < - 120 and Plants[model.line][3].model.type ~= nil then
+				elseif GetDistance(Plants[model.line][3].frame, model) > model.startpos and GetDistance(Plants[model.line][3].frame, model) < model.endpos and Plants[model.line][3].model.type ~= nil then
 					ChangeModelsAnimation(model, 61)
-				elseif GetDistance(Plants[model.line][2].frame, model) > - 170 and GetDistance(Plants[model.line][2].frame, model) < - 120 and Plants[model.line][2].model.type ~= nil then
+				elseif GetDistance(Plants[model.line][2].frame, model) > model.startpos and GetDistance(Plants[model.line][2].frame, model) < model.endpos and Plants[model.line][2].model.type ~= nil then
 					ChangeModelsAnimation(model, 61)
-				elseif GetDistance(Plants[model.line][1].frame, model) > - 170 and GetDistance(Plants[model.line][1].frame, model) < - 120 and Plants[model.line][1].model.type ~= nil then
+				elseif GetDistance(Plants[model.line][1].frame, model) > model.startpos and GetDistance(Plants[model.line][1].frame, model) < model.endpos and Plants[model.line][1].model.type ~= nil then
 					ChangeModelsAnimation(model, 61)
 				end
-				if model.pos > - 30 then
-					model.pos = model.pos - 0.3
+				if model.pos > model.stoppos then
+					model.pos = model.pos - model.speed
 				else
 					model:SetScript("OnUpdate", nil)
 				end
@@ -494,7 +501,7 @@ function ChangeModelsAnimation(model, anim)
 				if time > 1000 and Plants[model.line][model.next].model.health then
 					time = 0
 					if Plants[model.line][model.next].model.health > 0 then
-						Plants[model.line][model.next].model.health = Plants[model.line][model.next].model.health - 34
+						Plants[model.line][model.next].model.health = Plants[model.line][model.next].model.health - model.damage
 						local r = math.random(3)
 						if r == 1 then
 							r = ""
@@ -510,21 +517,21 @@ function ChangeModelsAnimation(model, anim)
 					DestroyPlant(Plants[model.line][model.next].model, model.line, model.next, true)
 				end
 				if Plants[model.line][model.next].model.type == nil then
-					if GetDistance(Plants[model.line][2].frame, model) < - 170 then
+					if GetDistance(Plants[model.line][2].frame, model) < model.startpos then
 						GetNextPlant(model, 1)
-					elseif GetDistance(Plants[model.line][3].frame, model) < - 170 then
+					elseif GetDistance(Plants[model.line][3].frame, model) < model.startpos then
 						GetNextPlant(model, 2)
-					elseif GetDistance(Plants[model.line][4].frame, model) < - 170 then
+					elseif GetDistance(Plants[model.line][4].frame, model) < model.startpos then
 						GetNextPlant(model, 3)
-					elseif GetDistance(Plants[model.line][5].frame, model) < - 170 then
+					elseif GetDistance(Plants[model.line][5].frame, model) < model.startpos then
 						GetNextPlant(model, 4)
-					elseif GetDistance(Plants[model.line][6].frame, model) < - 170 then
+					elseif GetDistance(Plants[model.line][6].frame, model) < model.startpos then
 						GetNextPlant(model, 5)
-					elseif GetDistance(Plants[model.line][7].frame, model) < - 170 then
+					elseif GetDistance(Plants[model.line][7].frame, model) < model.startpos then
 						GetNextPlant(model, 6)
-					elseif GetDistance(Plants[model.line][8].frame, model) < - 170 then
+					elseif GetDistance(Plants[model.line][8].frame, model) < model.startpos then
 						GetNextPlant(model, 7)
-					elseif GetDistance(Plants[model.line][9].frame, model) < - 170 then
+					elseif GetDistance(Plants[model.line][9].frame, model) < model.startpos then
 						GetNextPlant(model, 8)
 					end
 					ChangeModelsAnimation(model, 5)
@@ -534,17 +541,26 @@ function ChangeModelsAnimation(model, anim)
 	end
 end
 
-function InitModelGhouls(model, createdline)
+function InitModelGhouls(model, type, createdline)
 	model.line = createdline
 	model.next = 9
-	model.pos = 900 + math.random(100)
-	model:SetDisplayInfo(137)
-	model:SetAlpha(1)
-	model:SetCustomCamera(1)
+	model.pos = 900 + math.random(50, 150)
+	local r = math.random((#GhoulTypes[type].model))
+	model:SetDisplayInfo(GhoulTypes[type].model[r])
+	model.distance = GhoulTypes[type].distance
+	model.yaw = GhoulTypes[type].yaw
+	model.pitch = GhoulTypes[type].pitch
+	model.startpos = GhoulTypes[type].startpos
+	model.endpos = GhoulTypes[type].endpos
+	model.stoppos = GhoulTypes[type].stoppos
+	model.speed = GhoulTypes[type].speed
+	model.damage = GhoulTypes[type].damage
 	model:SetWidth(200)
 	model:SetHeight(200)
+	model:SetAlpha(1)
+	model:SetCustomCamera(1)
 	model:SetRotation(math.rad(0))
-	SetOrientation(model, 4.5772, - 1.5346, - 0.9802)
+	SetOrientation(model, model.distance, model.yaw, model.pitch)
 	ChangeModelsAnimation(model, 5)
 end
 
@@ -608,7 +624,8 @@ function InitAll()
 		end
 	end
 	for i = 1, 5 do
-		InitModelGhouls(Ghouls[i].model, i)
+		local r = math.random(2)
+		InitModelGhouls(Ghouls[i].model, r, i)
 	end
 end
 
