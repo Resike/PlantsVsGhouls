@@ -85,7 +85,9 @@ local GhoulTypes = {
 	-- Vanilla ghoul
 	[1] = {model = {[1] = 137, [2] = 414, [3] = 519, [4] = 547}, distance = 4.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 170, endpos = - 120, stoppos = - 30, speed = 0.3, damage = 34, health = 100},
 	-- Burning Crusade ghoul
-	[2] = {model = {[1] = 24992, [2] = 24993, [3] = 24994, [4] = 24995}, distance = 5.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 41, health = 150}
+	[2] = {model = {[1] = 24992, [2] = 24993, [3] = 24994, [4] = 24995}, distance = 5.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 41, health = 150},
+	-- Burning Crusade ghoul spiked
+	[3] = {model = {[1] = 28292, [2] = 30656}, distance = 5.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 45, health = 175}
 }
 
 local CurrentLine = nil
@@ -624,7 +626,7 @@ function InitAll()
 		end
 	end
 	for i = 1, 5 do
-		local r = math.random(2)
+		local r = math.random(3)
 		InitModelGhouls(Ghouls[i].model, r, i)
 	end
 end
