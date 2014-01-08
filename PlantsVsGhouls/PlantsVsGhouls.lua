@@ -70,7 +70,7 @@ local Plants = {
 }
 
 local PlantTypes = {
-	[1] = {model = "Creature\\LasherSunflower\\lasher_sunflower.m2", health = 100}
+	[1] = {model = "Creature\\LasherSunflower\\lasher_sunflower.m2", health = 100, cooldown = 1.5}
 }
 
 local Ghouls = {
@@ -82,11 +82,11 @@ local Ghouls = {
 }
 
 local GhoulTypes = {
-	-- Vanilla ghoul
+	-- Vanilla Ghoul
 	[1] = {model = {[1] = 137, [2] = 414, [3] = 519, [4] = 547}, distance = 4.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 170, endpos = - 120, stoppos = - 30, speed = 0.3, damage = 34, health = 100},
-	-- Burning Crusade ghoul
+	-- Burning Crusade Ghoul
 	[2] = {model = {[1] = 24992, [2] = 24993, [3] = 24994, [4] = 24995}, distance = 5.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 41, health = 150},
-	-- Burning Crusade ghoul spiked
+	-- Burning Crusade Ghoul Spiked
 	[3] = {model = {[1] = 28292, [2] = 30656}, distance = 5.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 45, health = 175}
 }
 
@@ -166,6 +166,9 @@ slot1:SetHeight(75)
 slot1:SetAlpha(1)
 slot1:SetBackdrop(backdrop)
 
+local slot1cd = CreateFrame("Cooldown", nil, slot1)
+slot1cd:SetAllPoints(slot1)
+
 local modelslot1 = CreateFrame("PlayerModel", nil, frame)
 
 function InitModelSlot1()
@@ -185,17 +188,21 @@ cursortempframe:SetAllPoints(UIParent)
 local cursortemp = CreateFrame("PlayerModel", nil, cursortempframe)
 
 modelslot1:SetScript("OnMouseDown", function(self, button)
-	DestroyMode = false
-	PlantMode = not PlantMode
-	if PlantMode then
-		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\seedlift.ogg", "Master")
+	if not slot1cd.start or GetTime() > (slot1cd.start + PlantTypes[CurrentPlant].cooldown) then
+		DestroyMode = false
+		PlantMode = not PlantMode
+		if PlantMode then
+			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\seedlift.ogg", "Master")
+		else
+			DisableModes()
+			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
+		end
+		CurrentPlant = 1
+		CreateCursorTemp()
+		cursortemp:SetScript("OnUpdate", OnUpdate)
 	else
-		DisableModes()
-		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
+		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buzzer.ogg", "Master")
 	end
-	CurrentPlant = 1
-	CreateCursorTemp()
-	cursortemp:SetScript("OnUpdate", OnUpdate)
 end)
 
 local slot2 = CreateFrame("Frame", nil, frame)
@@ -205,18 +212,18 @@ slot2:SetHeight(75)
 slot2:SetAlpha(1)
 slot2:SetBackdrop(backdrop)
 
-local modelslot2 = CreateFrame("PlayerModel", nil, frame)
+local modelslotx = CreateFrame("PlayerModel", nil, frame)
 
-function InitModelSlot2()
-	modelslot2:SetModel("World\\Generic\\goblin\\passivedoodads\\kezan\\items\\goblin_beachshovel_02.m2")
-	modelslot2:SetAlpha(1)
-	modelslot2:SetPosition(6.20, 0.03, 2.70)
-	modelslot2:SetRotation(math.rad(128))
-	modelslot2:SetAllPoints(slot2)
+function InitModelSlotX()
+	modelslotx:SetModel("World\\Generic\\goblin\\passivedoodads\\kezan\\items\\goblin_beachshovel_02.m2")
+	modelslotx:SetAlpha(1)
+	modelslotx:SetPosition(6.20, 0.03, 2.70)
+	modelslotx:SetRotation(math.rad(128))
+	modelslotx:SetAllPoints(slot2)
 end
-InitModelSlot2()
+InitModelSlotX()
 
-modelslot2:SetScript("OnMouseDown", function(self, button)
+modelslotx:SetScript("OnMouseDown", function(self, button)
 	PlantMode = false
 	DestroyMode = not DestroyMode
 	if DestroyMode then
@@ -390,8 +397,13 @@ end
 
 function CreatePlant(frame, model, ghoulmodel)
 	if PlantMode and Plants[CurrentLine][CurrentRow].model.type == nil then
+		Plants[CurrentLine][CurrentRow].model.time = GetTime()
 		Plants[CurrentLine][CurrentRow].model.type = CurrentPlant
 		Plants[CurrentLine][CurrentRow].model.health = PlantTypes[CurrentPlant].health
+		if CurrentPlant == 1 then
+			slot1cd:SetCooldown(GetTime(), PlantTypes[CurrentPlant].cooldown)
+			slot1cd.start = GetTime()
+		end
 		if GetDistance(frame, ghoulmodel) < - 120 and GetDistance(frame, ghoulmodel) > - 170 then
 			model.next = CurrentRow
 		end
@@ -610,8 +622,8 @@ function SetModelTilt(model, tiltdegree)
 end
 
 function DisableModes()
-	ClearTemp()
 	ClearCursorTemp()
+	ClearTemp()
 	PlantMode = false
 	DestroyMode = false
 end
@@ -619,7 +631,7 @@ end
 function InitAll()
 	InitModelSlot0()
 	InitModelSlot1()
-	InitModelSlot2()
+	InitModelSlotX()
 	for i = 1, 5 do
 		for j = 1, 9 do
 			InitModelPlants(Plants[i][j].model, i, j)
