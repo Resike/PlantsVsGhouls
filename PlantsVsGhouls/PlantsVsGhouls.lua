@@ -132,7 +132,7 @@ map:SetBlendMode("Disable")
 map:SetDrawLayer("Background", 0)
 map:SetAllPoints(frame)
 
-local backdrop = {
+local Backdrop = {
 	--edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
 	edgeSize = 10,
 	insets = {
@@ -143,28 +143,44 @@ local backdrop = {
 	}
 }
 
-local slot0 = CreateFrame("Frame", nil, frame)
-slot0:SetPoint("TopLeft", map, "TopLeft", 25, - 25)
-slot0:SetWidth(150)
-slot0:SetHeight(75)
-slot0:SetAlpha(1)
-slot0:SetBackdrop(backdrop)
+local SlotBackdrop = {
+	bgFile = "Interface\\Buttons\\White8x8.blp",
+	--[[edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
+	edgeSize = 0,
+	insets = {
+		left = 0,
+		right = 0,
+		top = 0,
+		bottom = 0
+	}]]
+}
 
-local modelslot0 = CreateFrame("PlayerModel", nil, frame)
+local sun = CreateFrame("Frame", nil, frame)
+sun:SetPoint("TopLeft", map, "TopLeft", 25, 0)
+sun:SetWidth(150)
+sun:SetHeight(150)
+sun:SetAlpha(1)
+sun:SetBackdrop(SlotBackdrop)
+sun:SetBackdropColor(0, 0, 0, 0.5)
 
-function InitModelSlot0()
-	modelslot0:SetModel("Spells\\Holybomb_missle.m2")
-	modelslot0:SetAlpha(1)
-	modelslot0:SetAllPoints(slot0)
+local sunmodel = CreateFrame("PlayerModel", nil, frame)
+
+function InitSunModel()
+	sunmodel:SetModel("Spells\\druid_wrath_missile_v2.m2")
+	sunmodel:SetAlpha(1)
+	sunmodel:SetPosition(3, 0, 1.35)
+	sunmodel:SetAllPoints(sun)
+	sunmodel.value = 25
 end
-InitModelSlot0()
+--InitSunModel()
 
 local slot1 = CreateFrame("Frame", nil, frame)
-slot1:SetPoint("Top", slot0, "Bottom", 0, - 25)
+slot1:SetPoint("Top", sun, "Bottom", 0, 0)
 slot1:SetWidth(150)
 slot1:SetHeight(75)
 slot1:SetAlpha(1)
-slot1:SetBackdrop(backdrop)
+slot1:SetBackdrop(SlotBackdrop)
+slot1:SetBackdropColor(0.5, 0.5, 0.5, 0.5)
 
 local slot1cd = CreateFrame("Cooldown", nil, slot1)
 slot1cd:SetAllPoints(slot1)
@@ -173,9 +189,15 @@ local modelslot1 = CreateFrame("PlayerModel", nil, frame)
 
 function InitModelSlot1()
 	modelslot1:SetModel("Creature\\LasherSunflower\\lasher_sunflower.m2")
+	modelslot1:SetWidth(149)
+	modelslot1:SetHeight(74)
 	modelslot1:SetAlpha(1)
 	modelslot1:SetCamera(0)
-	modelslot1:SetAllPoints(slot1)
+	--modelslot1:SetCustomCamera(1)
+	--modelslot1:SetRotation(math.rad(0))
+	--modelslot1:SetPosition(0, - 0.12, - 1.13)
+	--SetOrientation(modelslot1, 5.6592, - 0.2601, - 0.6799)
+	modelslot1:SetPoint("Top", sun, "Bottom", 0, 0)
 end
 InitModelSlot1()
 
@@ -210,7 +232,7 @@ slot2:SetPoint("Top", slot1, "Bottom", 0, 0)
 slot2:SetWidth(150)
 slot2:SetHeight(75)
 slot2:SetAlpha(1)
-slot2:SetBackdrop(backdrop)
+slot2:SetBackdrop(Backdrop)
 
 local modelslotx = CreateFrame("PlayerModel", nil, frame)
 
@@ -338,7 +360,7 @@ for i = 1, 5 do
 			Plants[i][j].frame:SetHeight(98)
 		end
 		Plants[i][j].frame:SetAlpha(1)
-		Plants[i][j].frame:SetBackdrop(backdrop)
+		Plants[i][j].frame:SetBackdrop(Backdrop)
 		Plants[i][j].frame.x = Plants[i][j].frame:GetWidth() / 2
 		Plants[i][j].frame.y = Plants[i][j].frame:GetHeight() / 2
 		Plants[i][j].model = CreateFrame("PlayerModel", nil, Plants[i][j].frame)
@@ -349,7 +371,7 @@ for i = 1, 5 do
 			OnLeave(Plants[i][j].model)
 		end)
 		Plants[i][j].frame:SetScript("OnMouseDown", function(self, button)
-			OnMouseDown(self, button, Plants[i][j].model, Ghouls[i].model)
+			OnMouseDown(self, button, Plants[i][j].model)
 		end)
 	end
 end
@@ -376,10 +398,10 @@ function OnLeave(model)
 	end
 end
 
-function OnMouseDown(self, button, model, ghoulmodel)
+function OnMouseDown(self, button, model)
 	if button == "LeftButton" then
 		if PlantMode then
-			CreatePlant(self, model, ghoulmodel)
+			CreatePlant(self, model)
 		elseif DestroyMode then
 			DestroyPlant(model, CurrentLine, CurrentRow)
 		end
@@ -395,7 +417,7 @@ function OnMouseDown(self, button, model, ghoulmodel)
 	end
 end
 
-function CreatePlant(frame, model, ghoulmodel)
+function CreatePlant(self, model)
 	if PlantMode and Plants[CurrentLine][CurrentRow].model.type == nil then
 		Plants[CurrentLine][CurrentRow].model.time = GetTime()
 		Plants[CurrentLine][CurrentRow].model.type = CurrentPlant
@@ -403,9 +425,6 @@ function CreatePlant(frame, model, ghoulmodel)
 		if CurrentPlant == 1 then
 			slot1cd:SetCooldown(GetTime(), PlantTypes[CurrentPlant].cooldown)
 			slot1cd.start = GetTime()
-		end
-		if GetDistance(frame, ghoulmodel) < - 120 and GetDistance(frame, ghoulmodel) > - 170 then
-			model.next = CurrentRow
 		end
 		InitModelPlants(model, CurrentLine, CurrentRow)
 		DisableModes()
@@ -443,6 +462,9 @@ function DestroyPlant(model, line, row, kill)
 end
 
 function SetModelColor(model, color)
+	if not model then
+		return
+	end
 	if not color then
 		model:SetLight(1, 0, 0, 1, 0, 1, 0.7, 0.7, 0.7, 1, 0.8, 0.8, 0.64) -- Base
 	elseif color == "BaseGlow" then
@@ -456,8 +478,11 @@ function SetModelColor(model, color)
 	end
 end
 
-function GetNextPlant(model, x)
-	for i = 1, x do
+function GetNextPlant(model, maxrow)
+	if not model then
+		return
+	end
+	for i = 1, maxrow do
 		if Plants[model.line][i].model.type ~= nil then
 			model.next = i
 		end
@@ -629,7 +654,7 @@ function DisableModes()
 end
 
 function InitAll()
-	InitModelSlot0()
+	InitSunModel()
 	InitModelSlot1()
 	InitModelSlotX()
 	for i = 1, 5 do
