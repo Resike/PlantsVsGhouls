@@ -90,11 +90,20 @@ local GhoulTypes = {
 	[3] = {model = {[1] = 28292, [2] = 30656}, distance = 5.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 45, health = 175}
 }
 
+local Slots = {
+	[1] = {frame, model, cooldown},
+	[2] = {frame, model, cooldown},
+	[3] = {frame, model, cooldown},
+	[4] = {frame, model, cooldown},
+	[5] = {frame, model, cooldown}
+}
+
 local CurrentLine = nil
 local CurrentRow = nil
 local CurrentGrid = nil
 
 local CurrentPlant = nil
+local CurrentSlot = nil
 
 local CurrentDegree = nil
 local CurrentSize = nil
@@ -172,91 +181,14 @@ function InitSunModel()
 	sunmodel:SetAllPoints(sun)
 	sunmodel.value = 25
 end
---InitSunModel()
-
-local slot1 = CreateFrame("Frame", nil, frame)
-slot1:SetPoint("Top", sun, "Bottom", 0, 0)
-slot1:SetWidth(150)
-slot1:SetHeight(75)
-slot1:SetAlpha(1)
-slot1:SetBackdrop(SlotBackdrop)
-slot1:SetBackdropColor(0.5, 0.5, 0.5, 0.5)
-
-local slot1cd = CreateFrame("Cooldown", nil, slot1)
-slot1cd:SetAllPoints(slot1)
-
-local modelslot1 = CreateFrame("PlayerModel", nil, frame)
-
-function InitModelSlot1()
-	modelslot1:SetModel("Creature\\LasherSunflower\\lasher_sunflower.m2")
-	modelslot1:SetWidth(149)
-	modelslot1:SetHeight(74)
-	modelslot1:SetAlpha(1)
-	modelslot1:SetCamera(0)
-	--modelslot1:SetCustomCamera(1)
-	--modelslot1:SetRotation(math.rad(0))
-	--modelslot1:SetPosition(0, - 0.12, - 1.13)
-	--SetOrientation(modelslot1, 5.6592, - 0.2601, - 0.6799)
-	modelslot1:SetPoint("Top", sun, "Bottom", 0, 0)
-end
-InitModelSlot1()
 
 local cursortempframe = CreateFrame("Frame", nil, UIParent)
-cursortempframe:SetFrameStrata("High")
+cursortempframe:SetFrameStrata("Dialog")
 cursortempframe:SetFrameLevel(0)
 cursortempframe:SetAlpha(1)
 cursortempframe:SetAllPoints(UIParent)
 
 local cursortemp = CreateFrame("PlayerModel", nil, cursortempframe)
-
-modelslot1:SetScript("OnMouseDown", function(self, button)
-	if not slot1cd.start or GetTime() > (slot1cd.start + PlantTypes[CurrentPlant].cooldown) then
-		DestroyMode = false
-		PlantMode = not PlantMode
-		if PlantMode then
-			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\seedlift.ogg", "Master")
-		else
-			DisableModes()
-			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
-		end
-		CurrentPlant = 1
-		CreateCursorTemp()
-		cursortemp:SetScript("OnUpdate", OnUpdate)
-	else
-		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buzzer.ogg", "Master")
-	end
-end)
-
-local slot2 = CreateFrame("Frame", nil, frame)
-slot2:SetPoint("Top", slot1, "Bottom", 0, 0)
-slot2:SetWidth(150)
-slot2:SetHeight(75)
-slot2:SetAlpha(1)
-slot2:SetBackdrop(Backdrop)
-
-local modelslotx = CreateFrame("PlayerModel", nil, frame)
-
-function InitModelSlotX()
-	modelslotx:SetModel("World\\Generic\\goblin\\passivedoodads\\kezan\\items\\goblin_beachshovel_02.m2")
-	modelslotx:SetAlpha(1)
-	modelslotx:SetPosition(6.20, 0.03, 2.70)
-	modelslotx:SetRotation(math.rad(128))
-	modelslotx:SetAllPoints(slot2)
-end
-InitModelSlotX()
-
-modelslotx:SetScript("OnMouseDown", function(self, button)
-	PlantMode = false
-	DestroyMode = not DestroyMode
-	if DestroyMode then
-		--PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\shovel.ogg", "Master")
-	else
-		DisableModes()
-		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
-	end
-	CreateCursorTemp()
-	cursortemp:SetScript("OnUpdate", OnUpdate)
-end)
 
 function CreateCursorTemp()
 	if PlantMode then
@@ -304,25 +236,71 @@ function ClearTemp()
 	temp:ClearModel()
 end
 
+for i = 1, 5 do
+	Slots[i].frame = CreateFrame("Frame", nil, frame)
+	if i == 1 then
+		Slots[i].frame:SetPoint("Top", sun, "Bottom", 0, 0)
+	else
+		Slots[i].frame:SetPoint("Top", Slots[i - 1].frame, "Bottom", 0, 0)
+	end
+	Slots[i].frame:SetWidth(150)
+	Slots[i].frame:SetHeight(75)
+	Slots[i].frame:SetAlpha(1)
+	Slots[i].frame:SetBackdrop(SlotBackdrop)
+	Slots[i].frame:SetBackdropColor(0.5, 0.5, 0.5, 0.5)
+	Slots[i].model = CreateFrame("PlayerModel", nil, frame)
+	if i == 1 then
+		Slots[i].model:SetPoint("Top", sun, "Bottom", 0, 0)
+	else
+		Slots[i].model:SetPoint("Top", Slots[i - 1].frame, "Bottom", 0, 0)
+	end
+	Slots[i].cooldown = CreateFrame("Cooldown", nil, Slots[i].frame)
+	Slots[i].cooldown:SetAllPoints(Slots[i].frame)
+	Slots[i].model:SetScript("OnMouseDown", function(self, button)
+		SlotOnMouseDown(button, Slots[i].model, Slots[i].cooldown)
+	end)
+end
+
+local slotx = CreateFrame("Frame", nil, frame)
+slotx:SetPoint("Top", Slots[5].frame, "Bottom", 0, 0)
+slotx:SetWidth(150)
+slotx:SetHeight(75)
+slotx:SetAlpha(1)
+slotx:SetBackdrop(SlotBackdrop)
+slotx:SetBackdropColor(0.5, 0.5, 0.5, 0.5)
+
+local modelslotx = CreateFrame("PlayerModel", nil, frame)
+
+function InitModelSlotX()
+	modelslotx:SetModel("World\\Generic\\goblin\\passivedoodads\\kezan\\items\\goblin_beachshovel_02.m2")
+	modelslotx:SetAlpha(1)
+	modelslotx:SetPosition(6.20, 0.03, 2.70)
+	modelslotx:SetRotation(math.rad(128))
+	modelslotx:SetAllPoints(slotx)
+end
+InitModelSlotX()
+
+modelslotx:SetScript("OnMouseDown", function(self, button)
+	PlantMode = false
+	DestroyMode = not DestroyMode
+	if DestroyMode then
+		--PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\shovel.ogg", "Master")
+	else
+		DisableModes()
+		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
+	end
+	CreateCursorTemp()
+	cursortemp:SetScript("OnUpdate", OnUpdate)
+end)
+
 function OnUpdate(self, elapsed)
 	local x, y = GetCursorPosition()
 	local scale = 1 / UIParent:GetEffectiveScale()
 	if PlantMode then
 		cursortemp:SetPoint("Center", UIParent, "BottomLeft", x * scale, y * scale)
 	elseif DestroyMode then
-		cursortemp:SetPoint("Center", UIParent, "BottomLeft", x * scale + (cursortemp:GetWidth() * 0.55), y * scale + (cursortemp:GetWidth() * 0.12))
+		cursortemp:SetPoint("Center", UIParent, "BottomLeft", x * scale + (cursortemp:GetWidth() * 0.55), y * scale + (cursortemp:GetHeight() * 0.12))
 	end
-end
-
-for i = 1, 5 do
-	Ghouls[i].frame = CreateFrame("Frame", nil, frame)
-	Ghouls[i].frame:SetFrameStrata("High")
-	Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", 900, 5)
-	Ghouls[i].frame:SetAlpha(1)
-	Ghouls[i].frame:SetWidth(200)
-	Ghouls[i].frame:SetHeight(200)
-	Ghouls[i].model = CreateFrame("PlayerModel", nil, Ghouls[i].frame)
-	Ghouls[i].model:SetAllPoints(Ghouls[i].frame)
 end
 
 for i = 1, 5 do
@@ -371,9 +349,51 @@ for i = 1, 5 do
 			OnLeave(Plants[i][j].model)
 		end)
 		Plants[i][j].frame:SetScript("OnMouseDown", function(self, button)
-			OnMouseDown(self, button, Plants[i][j].model)
+			OnMouseDown(button, Plants[i][j].model)
 		end)
 	end
+end
+
+for i = 1, 5 do
+	Ghouls[i].frame = CreateFrame("Frame", nil, frame)
+	Ghouls[i].frame:SetFrameStrata("High")
+	Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", 900, 5)
+	Ghouls[i].frame:SetAlpha(1)
+	Ghouls[i].frame:SetWidth(200)
+	Ghouls[i].frame:SetHeight(200)
+	Ghouls[i].model = CreateFrame("PlayerModel", nil, Ghouls[i].frame)
+	Ghouls[i].model:SetAllPoints(Ghouls[i].frame)
+end
+
+function SlotOnMouseDown(button, model, cooldown)
+	if not cooldown.start or GetTime() > (cooldown.start + PlantTypes[model.type].cooldown) then
+		DestroyMode = false
+		PlantMode = not PlantMode
+		if PlantMode then
+			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\seedlift.ogg", "Master")
+		else
+			DisableModes()
+			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\tap.ogg", "Master")
+		end
+		CurrentPlant = model.type
+		CurrentSlot = cooldown
+		CreateCursorTemp()
+		cursortemp:SetScript("OnUpdate", OnUpdate)
+	else
+		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buzzer.ogg", "Master")
+	end
+end
+
+function InitModelSlots(model, type)
+	model:SetModel(PlantTypes[type].model)
+	model.type = type
+	model:SetWidth(149)
+	model:SetHeight(74)
+	model:SetAlpha(1)
+	model:SetCamera(0)
+end
+for i = 1, 5 do
+	InitModelSlots(Slots[i].model, 1)
 end
 
 function OnEnter(self, line, row, model)
@@ -398,10 +418,10 @@ function OnLeave(model)
 	end
 end
 
-function OnMouseDown(self, button, model)
+function OnMouseDown(button, model)
 	if button == "LeftButton" then
 		if PlantMode then
-			CreatePlant(self, model)
+			CreatePlant(model)
 		elseif DestroyMode then
 			DestroyPlant(model, CurrentLine, CurrentRow)
 		end
@@ -417,15 +437,13 @@ function OnMouseDown(self, button, model)
 	end
 end
 
-function CreatePlant(self, model)
+function CreatePlant(model)
 	if PlantMode and Plants[CurrentLine][CurrentRow].model.type == nil then
 		Plants[CurrentLine][CurrentRow].model.time = GetTime()
 		Plants[CurrentLine][CurrentRow].model.type = CurrentPlant
 		Plants[CurrentLine][CurrentRow].model.health = PlantTypes[CurrentPlant].health
-		if CurrentPlant == 1 then
-			slot1cd:SetCooldown(GetTime(), PlantTypes[CurrentPlant].cooldown)
-			slot1cd.start = GetTime()
-		end
+		CurrentSlot:SetCooldown(GetTime(), PlantTypes[CurrentPlant].cooldown)
+		CurrentSlot.start = GetTime()
 		InitModelPlants(model, CurrentLine, CurrentRow)
 		DisableModes()
 		cursortemp:SetScript("OnUpdate", nil)
@@ -655,7 +673,9 @@ end
 
 function InitAll()
 	InitSunModel()
-	InitModelSlot1()
+	for i = 1, 5 do
+		InitModelSlots(Slots[i].model, 1)
+	end
 	InitModelSlotX()
 	for i = 1, 5 do
 		for j = 1, 9 do
