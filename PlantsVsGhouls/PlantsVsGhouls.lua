@@ -1,13 +1,19 @@
 local _, ns = ...
-local PlantsVsGhouls = { }
 
+local PlantsVsGhouls = { }
 ns.PlantsVsGhouls = PlantsVsGhouls
 
 local math = math
 local ipairs = ipairs
+local UIParent = UIParent
 
+local CreateFrame = CreateFrame
+local CreateTexture = CreateTexture
+local CreateFontString = CreateFontString
 local GetCursorPosition = GetCursorPosition
+local GetObjectType = GetObjectType
 local GetTime = GetTime
+local IsMouseButtonDown = IsMouseButtonDown
 local PlaySoundFile = PlaySoundFile
 
 local mainframe = CreateFrame("Frame", nil, UIParent)
@@ -153,7 +159,7 @@ frame:SetScript("OnMouseUp", function(self, button)
 end)
 
 local map = frame:CreateTexture(nil, "Background")
-map:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\background1unsodded.tga")
+map:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\BackgroundSun.tga")
 map:SetWidth(1400)
 map:SetHeight(600)
 map:SetAlpha(1)
@@ -161,29 +167,29 @@ map:SetBlendMode("Disable")
 map:SetDrawLayer("Background", 0)
 map:SetAllPoints(frame)
 
-local sod1line = frame:CreateTexture(nil, "Background")
-sod1line:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\sod1line.tga")
-sod1line:SetWidth(766)
-sod1line:SetHeight(118)
-sod1line:SetAlpha(0.99)
-sod1line:SetBlendMode("Disable")
-sod1line:SetDrawLayer("Background", 2)
-sod1line:SetPoint("Left", frame, "Left", 240, - 15)
+local sodonerow = frame:CreateTexture(nil, "Background")
+sodonerow:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\SodOneRow.tga")
+sodonerow:SetWidth(768)
+sodonerow:SetHeight(128)
+sodonerow:SetAlpha(0.99)
+sodonerow:SetBlendMode("Disable")
+sodonerow:SetDrawLayer("Background", 2)
+sodonerow:SetPoint("Left", frame, "Left", 240, - 29)
 
 local sodendcap = frame:CreateTexture(nil, "Background")
-sodendcap:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\sodendcap.tga")
+sodendcap:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\SodEndCap.tga")
 sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
 sodendcap:SetRotation(math.rad(0))
 sodendcap:SetAlpha(0.99)
 sodendcap:SetBlendMode("Disable")
 sodendcap:SetDrawLayer("Background", 6)
-sodendcap:SetPoint("Bottom", sod1line, "BottomRight", 0, - 10)
+sodendcap:SetPoint("Bottom", sodonerow, "BottomRight", 0, - 10)
 sodendcap:Hide()
 
 local sodend = frame:CreateTexture(nil, "Background")
-sodend:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\sodend.tga")
+sodend:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\SodEnd.tga")
 sodend:SetWidth(55)
-sodend:SetHeight(100)
+sodend:SetHeight(105)
 sodend:SetAlpha(0.99)
 sodend:SetBlendMode("Disable")
 sodend:SetDrawLayer("Background", 4)
@@ -199,7 +205,7 @@ function PlantsVsGhouls:FrameOnUpdate(elapsed)
 		return
 	end
 	frametimer = 0
-	local size = 766
+	local size = 768
 	percentCompleted = percentCompleted + 0.004
 	if percentCompleted >= 1 then
 		sodendcap:Hide()
@@ -213,8 +219,8 @@ function PlantsVsGhouls:FrameOnUpdate(elapsed)
 		sodendcap:SetSize(sodendcap:GetWidth() * (1 - (percentCompleted / 150)), sodendcap:GetHeight() * (1 - (percentCompleted / 150)))
 		sodendcap:SetRotation(math.rad(0 + (percentCompleted * - 2000)))
 		sodend:SetWidth(sodend:GetWidth() * (1 - (percentCompleted / 150)))
-		sod1line:SetWidth(size * percentCompleted)
-		sod1line:SetTexCoord(0, 0 + percentCompleted, 0, 1)
+		sodonerow:SetWidth(size * percentCompleted)
+		sodonerow:SetTexCoord(0, 0 + percentCompleted, 0, 1)
 	end
 end
 
@@ -427,7 +433,7 @@ for i = 1, 5 do
 		Plants[i][j].frame:SetAlpha(1)
 		Plants[i][j].frame:SetBackdrop(Backdrop)
 		Plants[i][j].frame.x = Plants[i][j].frame:GetWidth() / 2
-		Plants[i][j].frame.y = Plants[i][j].frame:GetHeight() / 3
+		Plants[i][j].frame.y = Plants[i][j].frame:GetHeight() / 2.2
 		Plants[i][j].model = CreateFrame("PlayerModel", nil, Plants[i][j].frame)
 		Plants[i][j].frame:SetScript("OnEnter", function(self)
 			PlantsVsGhouls:OnEnter(self, i, j, Plants[i][j].model)
@@ -444,7 +450,7 @@ end
 for i = 1, 5 do
 	Ghouls[i].frame = CreateFrame("Frame", nil, frame)
 	Ghouls[i].frame:SetFrameStrata("High")
-	Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", 900, 15)
+	Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", 900, 10)
 	Ghouls[i].frame:SetAlpha(1)
 	Ghouls[i].frame:SetWidth(200)
 	Ghouls[i].frame:SetHeight(200)
@@ -566,9 +572,6 @@ function PlantsVsGhouls:DestroyPlant(model, line, row, kill)
 end
 
 function PlantsVsGhouls:SetModelColor(model, color)
-	if not model then
-		return
-	end
 	if not color then
 		model:SetLight(1, 0, 0, 1, 0, 1, 0.7, 0.7, 0.7, 1, 0.8, 0.8, 0.64) -- Base
 	elseif color == "BaseGlow" then
@@ -583,9 +586,6 @@ function PlantsVsGhouls:SetModelColor(model, color)
 end
 
 function PlantsVsGhouls:GetNextPlant(model, maxrow)
-	if not model then
-		return
-	end
 	for i = 1, maxrow do
 		if Plants[model.line][i].model.type ~= nil then
 			model.next = i
@@ -616,7 +616,7 @@ function PlantsVsGhouls:ChangeGhoulAnimation(model, anim)
 				elapsed = elapsed + (elaps * 600)
 				model:SetSequenceTime(anim, elapsed)
 				if anim == 5 then
-					Ghouls[model.line].frame:SetPoint("Right", Plants[model.line][1].frame, "Right", model.pos, 15)
+					Ghouls[model.line].frame:SetPoint("Right", Plants[model.line][1].frame, "Right", model.pos, 10)
 					if self:GetDistance(Plants[model.line][9].frame, model) > model.startpos and self:GetDistance(Plants[model.line][9].frame, model) < model.endpos and Plants[model.line][9].model.type ~= nil then
 						self:ChangeGhoulAnimation(model, 61)
 					elseif self:GetDistance(Plants[model.line][8].frame, model) > model.startpos and self:GetDistance(Plants[model.line][8].frame, model) < model.endpos and Plants[model.line][8].model.type ~= nil then
@@ -731,6 +731,9 @@ function PlantsVsGhouls:GetDistance(obj1, obj2)
 end
 
 function PlantsVsGhouls:GetBaseCameraTarget(model)
+	if model:GetObjectType() ~= "PlayerModel" then
+		return
+	end
 	local modelfile = model:GetModel()
 	if modelfile and modelfile ~= "" then
 		local tempmodel = CreateFrame("PlayerModel", nil, UIParent)
@@ -743,6 +746,9 @@ function PlantsVsGhouls:GetBaseCameraTarget(model)
 end
 
 function PlantsVsGhouls:SetOrientation(model, distance, yaw, pitch)
+	if model:GetObjectType() ~= "PlayerModel" then
+		return
+	end
 	if model:HasCustomCamera() then
 		local x = distance * math.cos(yaw) * math.cos(pitch)
 		local y = distance * math.sin(- yaw) * math.cos(pitch)
@@ -752,6 +758,9 @@ function PlantsVsGhouls:SetOrientation(model, distance, yaw, pitch)
 end
 
 function PlantsVsGhouls:SetModelTilt(model, tiltdegree)
+	if model:GetObjectType() ~= "PlayerModel" then
+		return
+	end
 	if model:HasCustomCamera() then
 		local x, y, z = model:GetCameraPosition()
 		local r = math.sqrt((x * x) + (y * y) + (z * z))
@@ -786,33 +795,71 @@ function PlantsVsGhouls:DisableModes()
 	DestroyMode = false
 end
 
-local pause = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-pause:SetPoint("Top", frame, "Top", 225, 0)
-pause:SetWidth(100)
-pause:SetHeight(25)
-pause:SetText("Pause")
-pause:SetScript("OnClick", function(self, button)
+local pause = CreateFrame("Button", nil, frame)
+pause:SetPoint("Top", frame, "Top", 205, 0)
+pause:SetWidth(120)
+pause:SetHeight(35)
+pause:SetHitRectInsets(1, 1, 2, 4)
+pause:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+local font1 = "Interface\\AddOns\\PlantsVsGhouls\\Fonts\\Samdan.ttf"
+local font2 = "Interface\\AddOns\\PlantsVsGhouls\\Fonts\\Serio.ttf"
+local text = pause:CreateFontString(nil, "Artwork")
+text:SetFont(font2, 13, "Outline")
+text:SetTextColor(1, 1, 1, 1)
+text:SetText("Pause")
+text:SetPoint("Center", pause, "Center", 0, 0)
+
+pause:SetScript("OnEnter", function(self, button)
+	pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+	if IsMouseButtonDown(1) then
+		text:SetPoint("Center", pause, "Center", 1, - 1)
+	else
+		text:SetPoint("Center", pause, "Center", 0, 0)
+	end
+	text:SetTextColor(0, 1, 0, 1)
+	pause:SetScript("OnMouseUp", function(self, button)
+		if button == "LeftButton" then
+			PlantsVsGhouls:TogglePause()
+			text:SetPoint("Center", pause, "Center", 0, 0)
+		end
+	end)
+end)
+
+pause:SetScript("OnLeave", function(self, button)
+	pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+	text:SetPoint("Center", pause, "Center", 0, 0)
+	text:SetTextColor(1, 1, 1, 1)
+	pause:SetScript("OnMouseUp", nil)
+end)
+
+pause:SetScript("OnMouseDown", function(self, button)
 	if button == "LeftButton" then
-		PlantsVsGhouls:TogglePause(self)
+		pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+		text:SetPoint("Center", pause, "Center", 1, - 1)
+	else
+		pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
 	end
 end)
 
-function PlantsVsGhouls:TogglePause(frame)
+function PlantsVsGhouls:TogglePause()
 	if GamePaused then
 		self:ResumeGame()
-		frame:SetText("Pause")
+		text:SetText("Pause")
 		GamePaused = false
+		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
 	else
 		self:PauseGame()
-		frame:SetText("Resume")
+		text:SetText("Resume")
 		GamePaused = true
+		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\pause.ogg", "Master")
 	end
 end
 
 function PlantsVsGhouls:PauseGame()
 	self:DisableModes()
 	self:ClearCursorTemp()
-	PlantsVsGhouls:ClearTemp()
+	self:ClearTemp()
 	local time = GetTime()
 	for i = 1, 5 do
 		Slots[i].cooldown:Hide()
@@ -862,6 +909,9 @@ SLASH_PlantsVsGhouls2 = "/plantsvsghouls"
 function PlantsVsGhouls:SlashCommands(msg)
 	if msg == "" then
 		if mainframe:IsVisible() then
+			self:DisableModes()
+			self:ClearCursorTemp()
+			self:ClearTemp()
 			mainframe:Hide()
 			sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
 			sodend:SetWidth(60)
