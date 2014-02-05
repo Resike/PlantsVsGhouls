@@ -121,6 +121,8 @@ local ScaleLocked = false
 
 local GamePaused = false
 
+local GameStarted = false
+
 local Backdrop = {
 	--edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
 	edgeSize = 10,
@@ -455,6 +457,7 @@ optionsframe:SetScript("OnEnter", function(self)
 	end
 	optionsframe:SetScript("OnMouseUp", function(self, button)
 		if button == "LeftButton" then
+			PlantsVsGhouls:ToggleMenu()
 			options:SetPoint("BottomLeft", optionsframe, "BottomLeft", 0, 0)
 		end
 	end)
@@ -498,6 +501,7 @@ quitframe:SetScript("OnEnter", function(self)
 	quitframe:SetScript("OnMouseUp", function(self, button)
 		if button == "LeftButton" then
 			quit:SetPoint("BottomLeft", quitframe, "BottomLeft", 0, 0)
+			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
 			mainframe:Hide()
 		end
 	end)
@@ -563,8 +567,9 @@ flower3:SetDrawLayer("Background", 6)
 flower3:SetPoint("BottomRight", maskframe, "BottomRight", - 20, 90)
 
 local frame = CreateFrame("Frame", nil, UIParent)
+frame:SetFrameStrata("High")
 frame:SetPoint("Center", 0, 0)
-frame:SetWidth(1400)
+frame:SetWidth(1100)
 frame:SetHeight(600)
 frame:SetAlpha(1)
 frame:SetMovable(true)
@@ -575,6 +580,14 @@ function PlantsVsGhouls:InitModelGhoul()
 	startframe:SetScript("OnLeave", nil)
 	startframe:SetScript("OnMouseUp", nil)
 	startframe:SetScript("OnMouseDown", nil)
+	optionsframe:SetScript("OnEnter", nil)
+	optionsframe:SetScript("OnLeave", nil)
+	optionsframe:SetScript("OnMouseUp", nil)
+	optionsframe:SetScript("OnMouseDown", nil)
+	quitframe:SetScript("OnEnter", nil)
+	quitframe:SetScript("OnLeave", nil)
+	quitframe:SetScript("OnMouseUp", nil)
+	quitframe:SetScript("OnMouseDown", nil)
 	ghoul:SetDisplayInfo(547)
 	ghoul:SetWidth(800)
 	ghoul:SetHeight(800)
@@ -632,6 +645,60 @@ function PlantsVsGhouls:InitModelGhoul()
 					startshadow:SetPoint("Center", startframe, "Center", 0, 2)
 				end
 			end)
+			optionsframe:SetScript("OnEnter", function(self)
+				options:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsHighlight.tga")
+				if IsMouseButtonDown(1) then
+					options:SetPoint("BottomLeft", optionsframe, "BottomLeft", 1, 1)
+				else
+					options:SetPoint("BottomLeft", optionsframe, "BottomLeft", 0, 0)
+				end
+				optionsframe:SetScript("OnMouseUp", function(self, button)
+					if button == "LeftButton" then
+						PlantsVsGhouls:ToggleMenu()
+						options:SetPoint("BottomLeft", optionsframe, "BottomLeft", 0, 0)
+					end
+				end)
+			end)
+
+			optionsframe:SetScript("OnLeave", function(self)
+				options:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Options.tga")
+				options:SetPoint("BottomLeft", optionsframe, "BottomLeft", 0, 0)
+				optionsframe:SetScript("OnMouseUp", nil)
+			end)
+
+			optionsframe:SetScript("OnMouseDown", function(self, button)
+				if button == "LeftButton" then
+					options:SetPoint("BottomLeft", optionsframe, "BottomLeft", 1, 1)
+				end
+			end)
+			quitframe:SetScript("OnEnter", function(self)
+				quit:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\QuitHighlight.tga")
+				if IsMouseButtonDown(1) then
+					quit:SetPoint("BottomLeft", quitframe, "BottomLeft", 1, 1)
+				else
+					quit:SetPoint("BottomLeft", quitframe, "BottomLeft", 0, 0)
+				end
+				quitframe:SetScript("OnMouseUp", function(self, button)
+					if button == "LeftButton" then
+						quit:SetPoint("BottomLeft", quitframe, "BottomLeft", 0, 0)
+						PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
+						mainframe:Hide()
+					end
+				end)
+			end)
+			quitframe:SetScript("OnLeave", function(self)
+				quit:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Quit.tga")
+				quit:SetPoint("BottomLeft", quitframe, "BottomLeft", 0, 0)
+				quitframe:SetScript("OnMouseUp", nil)
+			end)
+			quitframe:SetScript("OnMouseDown", function(self, button)
+				if button == "LeftButton" then
+					quit:SetPoint("BottomLeft", quitframe, "BottomLeft", 1, 1)
+				end
+			end)
+			for i = 1, 5 do
+				Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", Ghouls[i].model.pos, 10)
+			end
 		end
 		if time > 100 then
 			time = 0
@@ -644,6 +711,14 @@ function PlantsVsGhouls:InitModelGhoul()
 	end)
 end
 
+local mainoptionspanelframe = CreateFrame("Frame", nil, mainframe)
+mainoptionspanelframe:SetFrameStrata("Fullscreen")
+mainoptionspanelframe:SetWidth(423)
+mainoptionspanelframe:SetHeight(498)
+mainoptionspanelframe:SetAlpha(1)
+mainoptionspanelframe:SetPoint("Center", mainframe, "Center", 0, 0)
+mainoptionspanelframe:Hide()
+
 startframe:SetScript("OnEnter", function(self)
 	start:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\StartAdventureHighlight.tga")
 	if IsMouseButtonDown(1) then
@@ -655,6 +730,9 @@ startframe:SetScript("OnEnter", function(self)
 	end
 	startframe:SetScript("OnMouseUp", function(self, button)
 		if button == "LeftButton" then
+			if mainoptionspanelframe:IsVisible() then
+				mainoptionspanelframe:Hide()
+			end
 			start:SetPoint("BottomLeft", startframe, "BottomLeft", 0, 0)
 			startshadow:SetPoint("Center", startframe, "Center", 0, 0)
 			PlantsVsGhouls:InitModelGhoul()
@@ -713,24 +791,69 @@ frame:SetScript("OnMouseUp", function(self, button)
 end)
 
 local map = frame:CreateTexture(nil, "Background")
-map:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\BackgroundSun.tga")
-map:SetWidth(1400)
+map:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\BackgroundSunUnsodded.tga")
+map:SetWidth(1100)
 map:SetHeight(600)
 map:SetAlpha(1)
 map:SetBlendMode("Disable")
 map:SetDrawLayer("Background", 0)
 map:SetAllPoints(frame)
+map:SetTexCoord(0, 0.785, 0, 1)
 
-local sodonerow = frame:CreateTexture(nil, "Background")
+local view = CreateFrame("Frame", nil, UIParent)
+
+local viewtimer = 0
+local viewCompleted = 0
+local viewCompleted2 = 0.215
+local holdtimer = 0
+
+function PlantsVsGhouls:ViewOnUpdate(elapsed)
+	viewtimer = viewtimer + elapsed
+	if viewtimer < 0.005 then
+		return
+	end
+	viewtimer = 0
+	if holdtimer < 1.5 then
+		holdtimer = holdtimer + elapsed
+	else
+		if viewCompleted >= 0.215 then
+			if viewCompleted2 < 0 then
+				map:SetTexCoord(0, 0.785, 0, 1)
+				view:SetScript("OnUpdate", nil)
+				frame:SetScript("OnUpdate", PlantsVsGhouls.FrameOnUpdate)
+			else
+				if holdtimer > 3 then
+					viewCompleted2 = viewCompleted2 - 0.002
+					map:SetTexCoord(0 + viewCompleted2, 0.785 + viewCompleted2, 0, 1)
+				else
+					holdtimer = holdtimer + elapsed
+				end
+			end
+		else
+			viewCompleted = viewCompleted + 0.002
+			map:SetTexCoord(0 + viewCompleted, 0.785 + viewCompleted, 0, 1)
+		end
+	end
+end
+
+local sodonerowframe = CreateFrame("Frame", nil, frame)
+sodonerowframe:SetFrameStrata("High")
+sodonerowframe:SetWidth(770)
+sodonerowframe:SetHeight(127)
+sodonerowframe:SetAlpha(1)
+sodonerowframe:SetPoint("Left", frame, "Left", 239, - 29)
+sodonerowframe:Hide()
+
+local sodonerow = sodonerowframe:CreateTexture(nil, "Background")
 sodonerow:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\SodOneRow.tga")
-sodonerow:SetWidth(768)
-sodonerow:SetHeight(128)
+sodonerow:SetWidth(770)
+sodonerow:SetHeight(127)
 sodonerow:SetAlpha(0.99)
 sodonerow:SetBlendMode("Disable")
 sodonerow:SetDrawLayer("Background", 2)
-sodonerow:SetPoint("Left", frame, "Left", 240, - 29)
+sodonerow:SetAllPoints(sodonerowframe)
 
-local sodendcap = frame:CreateTexture(nil, "Background")
+local sodendcap = sodonerowframe:CreateTexture(nil, "Background")
 sodendcap:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\SodEndCap.tga")
 sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
 sodendcap:SetRotation(math.rad(0))
@@ -740,7 +863,7 @@ sodendcap:SetDrawLayer("Background", 6)
 sodendcap:SetPoint("Bottom", sodonerow, "BottomRight", 0, - 10)
 sodendcap:Hide()
 
-local sodend = frame:CreateTexture(nil, "Background")
+local sodend = sodonerowframe:CreateTexture(nil, "Background")
 sodend:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\SodEnd.tga")
 sodend:SetWidth(57)
 sodend:SetHeight(110)
@@ -749,6 +872,8 @@ sodend:SetBlendMode("Disable")
 sodend:SetDrawLayer("Background", 4)
 sodend:SetPoint("Bottom", sodendcap, "Center", 0, 0)
 sodend:Hide()
+
+local anim = CreateFrame("Frame", nil, UIParent)
 
 local frametimer = 0
 local percentCompleted = 0
@@ -759,7 +884,7 @@ function PlantsVsGhouls:FrameOnUpdate(elapsed)
 		return
 	end
 	frametimer = 0
-	local size = 768
+	local size = 770
 	percentCompleted = percentCompleted + 0.004
 	if percentCompleted >= 1 then
 		sodendcap:Hide()
@@ -767,13 +892,15 @@ function PlantsVsGhouls:FrameOnUpdate(elapsed)
 		sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
 		sodend:SetWidth(60)
 		frame:SetScript("OnUpdate", nil)
+		anim:SetScript("OnUpdate", PlantsVsGhouls.AnimOnUpdate)
 	else
+		sodonerowframe:Show()
 		sodendcap:Show()
 		sodend:Show()
 		sodendcap:SetSize(sodendcap:GetWidth() * (1 - (percentCompleted / 150)), sodendcap:GetHeight() * (1 - (percentCompleted / 150)))
 		sodendcap:SetRotation(math.rad(0 + (percentCompleted * - 2000)))
 		sodend:SetWidth(sodend:GetWidth() * (1 - (percentCompleted / 150)))
-		sodonerow:SetWidth(size * percentCompleted)
+		sodonerowframe:SetWidth(size * percentCompleted)
 		sodonerow:SetTexCoord(0, 0 + percentCompleted, 0, 1)
 	end
 end
@@ -787,6 +914,92 @@ sod3line:SetBlendMode("Disable")
 sod3line:SetDrawLayer("Background", 2)
 sod3line:SetPoint("Left", frame, "Left", 240, - 15)
 sod3line:Hide()]]
+
+local overlayframe = CreateFrame("Frame", nil, frame)
+overlayframe:SetFrameStrata("Fullscreen")
+overlayframe:SetWidth(300)
+overlayframe:SetHeight(133)
+overlayframe:SetAlpha(1)
+overlayframe:SetPoint("Center", frame, "Center", 0, 0)
+
+local ready = overlayframe:CreateTexture(nil, "Background")
+ready:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Ready.tga")
+ready:SetWidth(300)
+ready:SetHeight(133)
+ready:SetAlpha(0.99)
+ready:SetBlendMode("Disable")
+ready:SetDrawLayer("Background", 0)
+ready:SetAllPoints(overlayframe)
+ready:Hide()
+
+local set = overlayframe:CreateTexture(nil, "Background")
+set:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Set.tga")
+set:SetWidth(300)
+set:SetHeight(133)
+set:SetAlpha(0.99)
+set:SetBlendMode("Disable")
+set:SetDrawLayer("Background", 0)
+set:SetAllPoints(overlayframe)
+set:Hide()
+
+local plant = overlayframe:CreateTexture(nil, "Background")
+plant:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Plant!.tga")
+plant:SetWidth(300)
+plant:SetHeight(133)
+plant:SetAlpha(0.99)
+plant:SetBlendMode("Disable")
+plant:SetDrawLayer("Background", 0)
+plant:SetAllPoints(overlayframe)
+plant:Hide()
+
+local animtimer = 0
+local animtimer2 = 0
+
+function PlantsVsGhouls:AnimOnUpdate(elapsed)
+	animtimer = animtimer + elapsed
+	if animtimer < 0.005 then
+		return
+	end
+	animtimer = 0
+	animtimer2 = animtimer2 + elapsed
+	if animtimer2 < 0.5 then
+		if not ready:IsVisible() then
+			ready:Show()
+			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\readysetplant.ogg", "Master")
+		end
+	elseif animtimer2 > 0.7 and animtimer2 < 1.2 then
+		if ready:IsVisible() then
+			ready:Hide()
+		end
+		if not set:IsVisible() then
+			set:Show()
+		end
+	elseif animtimer2 > 1.4 and animtimer2 < 1.9 then
+		if ready:IsVisible() then
+			ready:Hide()
+		end
+		if set:IsVisible() then
+			set:Hide()
+		end
+		if not plant:IsVisible() then
+			plant:Show()
+		end
+	elseif animtimer2 > 1.9 then
+		if ready:IsVisible() then
+			ready:Hide()
+		end
+		if set:IsVisible() then
+			set:Hide()
+		end
+		if plant:IsVisible() then
+			plant:Hide()
+		end
+		anim:SetScript("OnUpdate", nil)
+		GameStarted = true
+	else
+		plant:Hide()
+	end
+end
 
 local sun = CreateFrame("Frame", nil, frame)
 sun:SetPoint("TopLeft", map, "TopLeft", 25, 0)
@@ -903,7 +1116,7 @@ end
 PlantsVsGhouls:InitModelSlotX()
 
 modelslotx:SetScript("OnMouseDown", function(self, button)
-	if not GamePaused then
+	if GameStarted and not GamePaused then
 		PlantMode = false
 		DestroyMode = not DestroyMode
 		if DestroyMode then
@@ -990,7 +1203,7 @@ for i = 1, 5 do
 end
 
 function PlantsVsGhouls:SlotOnMouseDown(button, model, cooldown)
-	if not GamePaused and (not cooldown.start or GetTime() > (cooldown.start + PlantTypes[model.type].cooldown)) then
+	if GameStarted and not GamePaused and (not cooldown.start or GetTime() > (cooldown.start + PlantTypes[model.type].cooldown)) then
 		DestroyMode = false
 		PlantMode = not PlantMode
 		if PlantMode then
@@ -1128,7 +1341,7 @@ function PlantsVsGhouls:ChangePlantAnimation(model, anim)
 	if anim and anim > - 1 and anim < 802 then
 		local elapsed = 0
 		model:SetScript("OnUpdate", function(model, elaps)
-			if not GamePaused then
+			if GameStarted and not GamePaused then
 				elapsed = elapsed + (elaps * 600)
 				model:SetSequenceTime(anim, elapsed)
 			else
@@ -1143,7 +1356,7 @@ function PlantsVsGhouls:ChangeGhoulAnimation(model, anim)
 		local elapsed = 0
 		local time = 0
 		model:SetScript("OnUpdate", function(model, elaps)
-			if not GamePaused then
+			if GameStarted and not GamePaused then
 				elapsed = elapsed + (elaps * 600)
 				model:SetSequenceTime(anim, elapsed)
 				if anim == 5 then
@@ -1326,68 +1539,440 @@ function PlantsVsGhouls:DisableModes()
 	DestroyMode = false
 end
 
+local font1 = "Interface\\AddOns\\PlantsVsGhouls\\Fonts\\Samdan.ttf"
+local font2 = "Interface\\AddOns\\PlantsVsGhouls\\Fonts\\Serio.ttf"
+local font3 = "Interface\\AddOns\\PlantsVsGhouls\\Fonts\\Dwarven.ttf"
+
+local menu = CreateFrame("Button", nil, frame)
+menu:SetPoint("TopRight", frame, "TopRight", - 220, 0)
+menu:SetWidth(120)
+menu:SetHeight(35)
+menu:SetHitRectInsets(1, 1, 2, 4)
+menu:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+menu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+local menutext = menu:CreateFontString(nil, "Artwork")
+menutext:SetFont(font2, 13, "Outline")
+menutext:SetTextColor(1, 1, 1, 1)
+menutext:SetText("Menu")
+menutext:SetPoint("Center", menu, "Center", 0, 0)
+
+menu:SetScript("OnEnter", function(self, button)
+	if IsMouseButtonDown(1) then
+		menu:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+		menu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+		menutext:SetPoint("Center", menu, "Center", 1, - 1)
+	else
+		menu:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+		menu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+		menutext:SetPoint("Center", menu, "Center", 0, 0)
+	end
+	menutext:SetTextColor(0, 1, 0, 1)
+	menu:SetScript("OnMouseUp", function(self, button)
+		if button == "LeftButton" then
+			PlantsVsGhouls:ToggleMenu()
+			menutext:SetPoint("Center", menu, "Center", 0, 0)
+		end
+	end)
+end)
+
+menu:SetScript("OnLeave", function(self, button)
+	menu:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+	menu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+	menutext:SetPoint("Center", menu, "Center", 0, 0)
+	menutext:SetTextColor(1, 1, 1, 1)
+	menu:SetScript("OnMouseUp", nil)
+end)
+
+menu:SetScript("OnMouseDown", function(self, button)
+	if button == "LeftButton" then
+		menu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+		menutext:SetPoint("Center", menu, "Center", 1, - 1)
+	else
+		menu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+	end
+end)
+
+local optionspanelframe = CreateFrame("Frame", nil, frame)
+optionspanelframe:SetFrameStrata("Fullscreen")
+optionspanelframe:SetWidth(423)
+optionspanelframe:SetHeight(498)
+optionspanelframe:SetAlpha(1)
+optionspanelframe:SetPoint("Center", frame, "Center", 0, 0)
+optionspanelframe:Hide()
+
+local mainoptionspanel = mainoptionspanelframe:CreateTexture(nil, "Background")
+mainoptionspanel:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanel.tga")
+mainoptionspanel:SetWidth(423)
+mainoptionspanel:SetHeight(498)
+mainoptionspanel:SetAlpha(0.99)
+mainoptionspanel:SetBlendMode("Disable")
+mainoptionspanel:SetDrawLayer("Background", 0)
+mainoptionspanel:SetAllPoints(mainoptionspanelframe)
+
+local mainback = CreateFrame("Button", nil, mainoptionspanelframe)
+mainback:SetPoint("Bottom", mainoptionspanelframe, "Bottom", 0, 15)
+mainback:SetWidth(360)
+mainback:SetHeight(100)
+mainback:SetHitRectInsets(1, 1, 2, 4)
+mainback:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+mainback:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButtonDown.tga")
+local mainbacktext = mainback:CreateFontString(nil, "Artwork")
+mainbacktext:SetFont(font3, 62, "Outline")
+mainbacktext:SetTextColor(1, 1, 1, 1)
+mainbacktext:SetText("Ok")
+mainbacktext:SetPoint("Center", mainback, "Center", 0, 0)
+
+mainback:SetScript("OnEnter", function(self, button)
+	if IsMouseButtonDown(1) then
+		mainback:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButtonDown.tga")
+		mainback:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButtonDown.tga")
+		mainbacktext:SetPoint("Center", mainback, "Center", 0, - 1)
+	else
+		mainback:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+		mainback:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+		mainbacktext:SetPoint("Center", mainback, "Center", 0, 0)
+	end
+	mainbacktext:SetTextColor(0, 1, 0, 1)
+	mainback:SetScript("OnMouseUp", function(self, button)
+		if button == "LeftButton" then
+			if mainoptionspanelframe:IsVisible() then
+				mainoptionspanelframe:Hide()
+			end
+			mainbacktext:SetPoint("Center", mainback, "Center", 0, 0)
+			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
+		end
+	end)
+end)
+
+mainback:SetScript("OnLeave", function(self, button)
+	mainback:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+	mainback:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+	mainbacktext:SetPoint("Center", mainback, "Center", 0, 0)
+	mainbacktext:SetTextColor(1, 1, 1, 1)
+	mainback:SetScript("OnMouseUp", nil)
+end)
+
+mainback:SetScript("OnMouseDown", function(self, button)
+	if button == "LeftButton" then
+		mainback:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButtonDown.tga")
+		mainbacktext:SetPoint("Center", mainback, "Center", 0, - 1)
+	else
+		mainback:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+	end
+end)
+
+function PlantsVsGhouls:ToggleMenu()
+	if not GameStarted then
+		if mainframe:IsVisible() then
+			if mainoptionspanelframe:IsVisible() then
+				mainoptionspanelframe:Hide()
+				PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
+			else
+				mainoptionspanelframe:Show()
+				PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\pause.ogg", "Master")
+			end
+		else
+			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buzzer.ogg", "Master")
+		end
+		return
+	end
+	if optionspanelframe:IsVisible() then
+		optionspanelframe:Hide()
+		self:ResumeGame()
+		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
+	else
+		optionspanelframe:Show()
+		self:PauseGame()
+		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\pause.ogg", "Master")
+	end
+end
+
+local optionspanel = optionspanelframe:CreateTexture(nil, "Background")
+optionspanel:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanel.tga")
+optionspanel:SetWidth(423)
+optionspanel:SetHeight(498)
+optionspanel:SetAlpha(0.99)
+optionspanel:SetBlendMode("Disable")
+optionspanel:SetDrawLayer("Background", 0)
+optionspanel:SetAllPoints(optionspanelframe)
+
+local back = CreateFrame("Button", nil, optionspanelframe)
+back:SetPoint("Bottom", optionspanelframe, "Bottom", 0, 15)
+back:SetWidth(360)
+back:SetHeight(100)
+back:SetHitRectInsets(1, 1, 2, 4)
+back:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+back:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButtonDown.tga")
+local backtext = back:CreateFontString(nil, "Artwork")
+backtext:SetFont(font3, 62, "Outline")
+backtext:SetTextColor(1, 1, 1, 1)
+backtext:SetText("Back To Game")
+backtext:SetPoint("Center", back, "Center", 0, 0)
+
+back:SetScript("OnEnter", function(self, button)
+	if IsMouseButtonDown(1) then
+		back:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButtonDown.tga")
+		back:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButtonDown.tga")
+		backtext:SetPoint("Center", back, "Center", 0, - 1)
+	else
+		back:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+		back:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+		backtext:SetPoint("Center", back, "Center", 0, 0)
+	end
+	backtext:SetTextColor(0, 1, 0, 1)
+	back:SetScript("OnMouseUp", function(self, button)
+		if button == "LeftButton" then
+			optionspanelframe:Hide()
+			backtext:SetPoint("Center", back, "Center", 0, 0)
+			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
+			PlantsVsGhouls:ResumeGame()
+		end
+	end)
+end)
+
+back:SetScript("OnLeave", function(self, button)
+	back:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+	back:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+	backtext:SetPoint("Center", back, "Center", 0, 0)
+	backtext:SetTextColor(1, 1, 1, 1)
+	back:SetScript("OnMouseUp", nil)
+end)
+
+back:SetScript("OnMouseDown", function(self, button)
+	if button == "LeftButton" then
+		back:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButtonDown.tga")
+		backtext:SetPoint("Center", back, "Center", 0, - 1)
+	else
+		back:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+	end
+end)
+
+local mainmenu = CreateFrame("Button", nil, optionspanelframe)
+mainmenu:SetPoint("Bottom", optionspanel, "Bottom", 0, 130)
+mainmenu:SetWidth(200)
+mainmenu:SetHeight(45)
+mainmenu:SetHitRectInsets(1, 1, 2, 4)
+mainmenu:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+mainmenu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+local mainmenutext = mainmenu:CreateFontString(nil, "Artwork")
+mainmenutext:SetFont(font3, 18, "Outline")
+mainmenutext:SetTextColor(1, 1, 1, 1)
+mainmenutext:SetText("Main Menu")
+mainmenutext:SetPoint("Center", mainmenu, "Center", 0, 0)
+
+mainmenu:SetScript("OnEnter", function(self, button)
+	if IsMouseButtonDown(1) then
+		mainmenu:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+		mainmenu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+		mainmenutext:SetPoint("Center", mainmenu, "Center", 1, - 1)
+	else
+		mainmenu:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+		mainmenu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+		mainmenutext:SetPoint("Center", mainmenu, "Center", 0, 0)
+	end
+	mainmenutext:SetTextColor(0, 1, 0, 1)
+	mainmenu:SetScript("OnMouseUp", function(self, button)
+		if button == "LeftButton" then
+			mainmenutext:SetPoint("Center", mainmenu, "Center", 0, 0)
+			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
+			PlantsVsGhouls:Mainmenu()
+		end
+	end)
+end)
+
+mainmenu:SetScript("OnLeave", function(self, button)
+	mainmenu:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+	mainmenu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+	mainmenutext:SetPoint("Center", mainmenu, "Center", 0, 0)
+	mainmenutext:SetTextColor(1, 1, 1, 1)
+	mainmenu:SetScript("OnMouseUp", nil)
+end)
+
+mainmenu:SetScript("OnMouseDown", function(self, button)
+	if button == "LeftButton" then
+		mainmenu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+		mainmenutext:SetPoint("Center", mainmenu, "Center", 1, - 1)
+	else
+		mainmenu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+	end
+end)
+
+function PlantsVsGhouls:Mainmenu()
+	if optionspanelframe:IsVisible() then
+		optionspanelframe:Hide()
+	end
+	self:ClearLevel()
+	GamePaused = false
+	GameStarted = false
+	sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
+	sodend:SetWidth(60)
+	percentCompleted = 0
+	sodonerowframe:Hide()
+	viewtimer = 0
+	viewCompleted = 0
+	viewCompleted2 = 0.215
+	holdtimer = 0
+	animtimer = 0
+	animtimer2 = 0
+	frame:Hide()
+	self:InitModelSky()
+	mainframe:Show()
+end
+
+local restart = CreateFrame("Button", nil, optionspanelframe)
+restart:SetPoint("Bottom", optionspanel, "Bottom", 0, 170)
+restart:SetWidth(200)
+restart:SetHeight(45)
+restart:SetHitRectInsets(1, 1, 2, 4)
+restart:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+restart:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+local restarttext = restart:CreateFontString(nil, "Artwork")
+restarttext:SetFont(font3, 18, "Outline")
+restarttext:SetTextColor(1, 1, 1, 1)
+restarttext:SetText("Restart Game")
+restarttext:SetPoint("Center", restart, "Center", 0, 0)
+
+restart:SetScript("OnEnter", function(self, button)
+	if IsMouseButtonDown(1) then
+		restart:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+		restart:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+		restarttext:SetPoint("Center", restart, "Center", 1, - 1)
+	else
+		restart:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+		restart:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+		restarttext:SetPoint("Center", restart, "Center", 0, 0)
+	end
+	restarttext:SetTextColor(0, 1, 0, 1)
+	restart:SetScript("OnMouseUp", function(self, button)
+		if button == "LeftButton" then
+			restarttext:SetPoint("Center", restart, "Center", 0, 0)
+			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
+			PlantsVsGhouls:RestartLevel()
+		end
+	end)
+end)
+
+restart:SetScript("OnLeave", function(self, button)
+	restart:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+	restart:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+	restarttext:SetPoint("Center", restart, "Center", 0, 0)
+	restarttext:SetTextColor(1, 1, 1, 1)
+	restart:SetScript("OnMouseUp", nil)
+end)
+
+restart:SetScript("OnMouseDown", function(self, button)
+	if button == "LeftButton" then
+		restart:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+		restarttext:SetPoint("Center", restart, "Center", 1, - 1)
+	else
+		restart:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+	end
+end)
+
+function PlantsVsGhouls:RestartLevel()
+	if optionspanelframe:IsVisible() then
+		optionspanelframe:Hide()
+	end
+	for i = 1, 5 do
+		local r = math.random(3)
+		self:InitModelGhouls(Ghouls[i].model, r, i)
+		Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", Ghouls[i].model.pos, 10)
+	end
+	self:ClearLevel()
+	GamePaused = false
+	GameStarted = false
+	sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
+	sodend:SetWidth(60)
+	percentCompleted = 0
+	sodonerowframe:Hide()
+	viewtimer = 0
+	viewCompleted = 0
+	viewCompleted2 = 0.215
+	holdtimer = 0
+	view:SetScript("OnUpdate", PlantsVsGhouls.ViewOnUpdate)
+	animtimer = 0
+	animtimer2 = 0
+end
+
 local pause = CreateFrame("Button", nil, frame)
-pause:SetPoint("Top", frame, "Top", 205, 0)
+pause:SetPoint("TopRight", frame, "TopRight", - 100, 0)
 pause:SetWidth(120)
 pause:SetHeight(35)
 pause:SetHitRectInsets(1, 1, 2, 4)
 pause:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
 pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
-local font1 = "Interface\\AddOns\\PlantsVsGhouls\\Fonts\\Samdan.ttf"
-local font2 = "Interface\\AddOns\\PlantsVsGhouls\\Fonts\\Serio.ttf"
-local text = pause:CreateFontString(nil, "Artwork")
-text:SetFont(font2, 13, "Outline")
-text:SetTextColor(1, 1, 1, 1)
-text:SetText("Pause")
-text:SetPoint("Center", pause, "Center", 0, 0)
+local pausetext = pause:CreateFontString(nil, "Artwork")
+pausetext:SetFont(font2, 13, "Outline")
+pausetext:SetTextColor(1, 1, 1, 1)
+pausetext:SetText("Pause")
+pausetext:SetPoint("Center", pause, "Center", 0, 0)
 
 pause:SetScript("OnEnter", function(self, button)
-	pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
 	if IsMouseButtonDown(1) then
-		text:SetPoint("Center", pause, "Center", 1, - 1)
+		pause:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+		pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
+		pausetext:SetPoint("Center", pause, "Center", 1, - 1)
 	else
-		text:SetPoint("Center", pause, "Center", 0, 0)
+		pause:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+		pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+		pausetext:SetPoint("Center", pause, "Center", 0, 0)
 	end
-	text:SetTextColor(0, 1, 0, 1)
+	pausetext:SetTextColor(0, 1, 0, 1)
 	pause:SetScript("OnMouseUp", function(self, button)
 		if button == "LeftButton" then
+			if optionspanelframe:IsVisible() then
+				optionspanelframe:Hide()
+			end
 			PlantsVsGhouls:TogglePause()
-			text:SetPoint("Center", pause, "Center", 0, 0)
+			pausetext:SetPoint("Center", pause, "Center", 0, 0)
 		end
 	end)
 end)
 
 pause:SetScript("OnLeave", function(self, button)
+	pause:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
 	pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
-	text:SetPoint("Center", pause, "Center", 0, 0)
-	text:SetTextColor(1, 1, 1, 1)
+	pausetext:SetPoint("Center", pause, "Center", 0, 0)
+	pausetext:SetTextColor(1, 1, 1, 1)
 	pause:SetScript("OnMouseUp", nil)
 end)
 
 pause:SetScript("OnMouseDown", function(self, button)
 	if button == "LeftButton" then
 		pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
-		text:SetPoint("Center", pause, "Center", 1, - 1)
+		pausetext:SetPoint("Center", pause, "Center", 1, - 1)
 	else
 		pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
 	end
 end)
 
+function PlantsVsGhouls:ClearLevel()
+	for i = 1, 5 do
+		for j = 1, 9 do
+			Plants[i][j].model.type = nil
+			Plants[i][j].model:ClearModel()
+		end
+	end
+end
+
 function PlantsVsGhouls:TogglePause()
+	if not GameStarted then
+		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buzzer.ogg", "Master")
+		return
+	end
 	if GamePaused then
 		self:ResumeGame()
-		text:SetText("Pause")
-		GamePaused = false
+		pausetext:SetText("Pause")
 		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
 	else
 		self:PauseGame()
-		text:SetText("Resume")
-		GamePaused = true
+		pausetext:SetText("Resume")
 		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\pause.ogg", "Master")
 	end
 end
 
 function PlantsVsGhouls:PauseGame()
+	GamePaused = true
 	self:DisableModes()
 	self:ClearCursorTemp()
 	self:ClearTemp()
@@ -1401,6 +1986,7 @@ function PlantsVsGhouls:PauseGame()
 end
 
 function PlantsVsGhouls:ResumeGame()
+	GamePaused = false
 	local time = GetTime()
 	for i = 1, 5 do
 		Slots[i].cooldown:Show()
@@ -1412,6 +1998,8 @@ function PlantsVsGhouls:ResumeGame()
 end
 
 function PlantsVsGhouls:InitAll()
+	GameStarted = false
+	--self:ResizeFrame(mainframe)
 	--self:ResizeFrame(frame)
 	self:InitSunModel()
 	for i = 1, 5 do
@@ -1427,7 +2015,14 @@ function PlantsVsGhouls:InitAll()
 		local r = math.random(3)
 		self:InitModelGhouls(Ghouls[i].model, r, i)
 	end
-	frame:SetScript("OnUpdate", PlantsVsGhouls.FrameOnUpdate)
+	sodonerowframe:Hide()
+	viewtimer = 0
+	viewCompleted = 0
+	viewCompleted2 = 0.215
+	holdtimer = 0
+	view:SetScript("OnUpdate", PlantsVsGhouls.ViewOnUpdate)
+	animtimer = 0
+	animtimer2 = 0
 	PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\dirt_rise.ogg", "Master")
 end
 
