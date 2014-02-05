@@ -90,9 +90,9 @@ local Ghouls = {
 local GhoulTypes = {
 	-- Vanilla Ghoul (508)
 	[1] = {model = {[1] = 137, [2] = 414, [3] = 519, [4] = 547}, distance = 4.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 170, endpos = - 120, stoppos = - 30, speed = 0.3, damage = 34, health = 100},
-	-- Burning Crusade Ghoul
+	-- Burning Crusade Ghoul (938)
 	[2] = {model = {[1] = 24992, [2] = 24993, [3] = 24994, [4] = 24995}, distance = 5.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 41, health = 150},
-	-- Burning Crusade Ghoul Spiked
+	-- Burning Crusade Ghoul Spiked (939)
 	[3] = {model = {[1] = 28292, [2] = 30656}, distance = 5.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 45, health = 175}
 }
 
@@ -103,6 +103,8 @@ local Slots = {
 	[4] = {frame, model, cooldown},
 	[5] = {frame, model, cooldown}
 }
+
+local Debug = false
 
 local CurrentLine = nil
 local CurrentRow = nil
@@ -157,8 +159,8 @@ mainframe:Hide()
 
 local skyframe = CreateFrame("Frame", nil, mainframe)
 skyframe:SetFrameStrata("Low")
-skyframe:SetWidth(1098)
-skyframe:SetHeight(698)
+skyframe:SetWidth(1100)
+skyframe:SetHeight(700)
 skyframe:SetAlpha(1)
 skyframe:SetPoint("Center", mainframe, "Center", 0, 0)
 
@@ -167,10 +169,10 @@ local sky = CreateFrame("PlayerModel", nil, skyframe)
 function PlantsVsGhouls:InitModelSky()
 	sky:SetModel("Environments\\Stars\\Maelstrom_Sky03_Stormbreak.m2")
 	--sky:SetModel("Environments\\Stars\\Lostislegloomyskybox.m2")
-	sky:SetWidth(1100)
-	sky:SetHeight(700)
+	sky:SetWidth(1099)
+	sky:SetHeight(699)
 	sky:SetAlpha(1)
-	sky:SetAllPoints(skyframe)
+	sky:SetPoint("TopLeft", skyframe, "TopLeft", 0, 0)
 end
 
 local house = mainframe:CreateTexture(nil, "Background")
@@ -1198,6 +1200,10 @@ for i = 1, 5 do
 	Ghouls[i].frame:SetAlpha(1)
 	Ghouls[i].frame:SetWidth(200)
 	Ghouls[i].frame:SetHeight(200)
+	if Debug == true then
+		Ghouls[i].frame:SetBackdrop(SlotBackdrop)
+		Ghouls[i].frame:SetBackdropColor(0.8, 0.2, 0.2, 0.5)
+	end
 	Ghouls[i].model = CreateFrame("PlayerModel", nil, Ghouls[i].frame)
 	Ghouls[i].model:SetAllPoints(Ghouls[i].frame)
 end
@@ -1360,7 +1366,18 @@ function PlantsVsGhouls:ChangeGhoulAnimation(model, anim)
 				elapsed = elapsed + (elaps * 600)
 				model:SetSequenceTime(anim, elapsed)
 				if anim == 5 then
-					Ghouls[model.line].frame:SetPoint("Right", Plants[model.line][1].frame, "Right", model.pos, 10)
+					if model.z == 0 or Ghouls[model.line].frame:GetRight() > frame:GetRight() then
+						Ghouls[model.line].frame:SetPoint("Right", Plants[model.line][1].frame, "Right", model.pos, 10)
+					else
+						if model.type == 1 or model.type == 2 or model.type == 3 then
+							if model.z < 0 then
+								model:SetPosition(model.z, 0, 0)
+							else
+								model.z = 0
+								model:SetPosition(0, 0, 0)
+							end
+						end
+					end
 					if self:GetDistance(Plants[model.line][9].frame, model) > model.startpos and self:GetDistance(Plants[model.line][9].frame, model) < model.endpos and Plants[model.line][9].model.type ~= nil then
 						self:ChangeGhoulAnimation(model, 61)
 					elseif self:GetDistance(Plants[model.line][8].frame, model) > model.startpos and self:GetDistance(Plants[model.line][8].frame, model) < model.endpos and Plants[model.line][8].model.type ~= nil then
@@ -1381,7 +1398,11 @@ function PlantsVsGhouls:ChangeGhoulAnimation(model, anim)
 						self:ChangeGhoulAnimation(model, 61)
 					end
 					if model.pos > model.stoppos then
-						model.pos = model.pos - model.speed
+						if model.z == 0 or Ghouls[model.line].frame:GetRight() > frame:GetRight() then
+							model.pos = model.pos - model.speed
+						else
+							model.z = model.z + (model.speed / 50)
+						end
 					else
 						self:ChangeGhoulAnimation(model, 8)
 						--model:SetScript("OnUpdate", nil)
@@ -1448,6 +1469,7 @@ function PlantsVsGhouls:ChangeGhoulAnimation(model, anim)
 end
 
 function PlantsVsGhouls:InitModelGhouls(model, type, createdline)
+	model.type = type
 	model.line = createdline
 	model.next = 9
 	model.pos = 900 + math.random(50, 150)
@@ -1467,6 +1489,13 @@ function PlantsVsGhouls:InitModelGhouls(model, type, createdline)
 	model:SetCustomCamera(1)
 	model:SetRotation(math.rad(0))
 	self:SetOrientation(model, model.distance, model.yaw, model.pitch)
+	if type == 1 then
+		model:SetPosition(- 3, 0, 0)
+		model.z = - 3
+	elseif type == 2 or type == 3 then
+		model:SetPosition(- 3.75, 0, 0)
+		model.z = - 3.75
+	end
 	self:ChangeGhoulAnimation(model, 5)
 end
 
@@ -1498,6 +1527,10 @@ function PlantsVsGhouls:SetOrientation(model, distance, yaw, pitch)
 		local y = distance * math.sin(- yaw) * math.cos(pitch)
 		local z = (distance * math.sin(- pitch))
 		model:SetCameraPosition(x, y, z)
+		--[[local x, y, z = self:GetBaseCameraTarget(model)
+		if x and y and z then
+			model:SetCameraTarget(x, y, z)
+		end]]
 	end
 end
 
