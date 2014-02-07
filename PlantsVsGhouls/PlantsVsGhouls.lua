@@ -16,6 +16,9 @@ local GetTime = GetTime
 local IsMouseButtonDown = IsMouseButtonDown
 local PlaySoundFile = PlaySoundFile
 
+local BaseScale = 0.73142856359482
+local UIParentScale
+
 local Plants = {
 	[1] = {
 		[1] = {frame, model},
@@ -89,11 +92,11 @@ local Ghouls = {
 
 local GhoulTypes = {
 	-- Vanilla Ghoul (508)
-	[1] = {model = {[1] = 137, [2] = 414, [3] = 519, [4] = 547}, distance = 4.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 170, endpos = - 120, stoppos = - 30, speed = 0.3, damage = 34, health = 100},
+	[1] = {model = {[1] = 137, [2] = 414, [3] = 519, [4] = 547}, distance = 4.5772 / BaseScale, yaw = - 1.5346, pitch = - 0.9802, startpos = - 170, endpos = - 120, stoppos = - 30, speed = 0.3, damage = 34, health = 100},
 	-- Burning Crusade Ghoul (938)
-	[2] = {model = {[1] = 24992, [2] = 24993, [3] = 24994, [4] = 24995}, distance = 5.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 41, health = 150},
+	[2] = {model = {[1] = 24992, [2] = 24993, [3] = 24994, [4] = 24995}, distance = 5.5772 / BaseScale, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 41, health = 150},
 	-- Burning Crusade Ghoul Spiked (939)
-	[3] = {model = {[1] = 28292, [2] = 30656}, distance = 5.5772, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 45, health = 175}
+	[3] = {model = {[1] = 28292, [2] = 30656}, distance = 5.5772 / BaseScale, yaw = - 1.5346, pitch = - 0.9802, startpos = - 190, endpos = - 140, stoppos = - 50, speed = 0.4, damage = 45, health = 175}
 }
 
 local Slots = {
@@ -165,6 +168,31 @@ mainframe:SetHeight(700)
 mainframe:SetAlpha(1)
 mainframe:SetMovable(true)
 mainframe:Hide()
+
+--mainframe:RegisterEvent("ADDON_LOADED")
+--mainframe:RegisterEvent("PLAYER_ENTERING_WORLD")
+mainframe:RegisterEvent("VARIABLES_LOADED")
+
+function PlantsVsGhouls:OnEvent(event, ...)
+	if event == "VARIABLES_LOADED" then
+		UIParentScale = UIParent:GetScale()
+		for i = 1, #GhoulTypes do
+			--GhoulTypes[i].distance = GhoulTypes[i].distance * UIParentScale
+		end
+	end
+end
+
+mainframe:SetScript("OnEvent", PlantsVsGhouls.OnEvent)
+
+local function GetScreenHeightScale()
+	local screenHeight = 768
+	return GetScreenHeight() / screenHeight
+end
+
+local function GetScreenWidthScale()
+	local screenWidth = 1024
+	return GetScreenWidth() / screenWidth
+end
 
 local skyframe = CreateFrame("Frame", nil, mainframe)
 skyframe:SetFrameStrata("Low")
@@ -1025,7 +1053,7 @@ local sunmodel = CreateFrame("PlayerModel", nil, frame)
 function PlantsVsGhouls:InitSunModel()
 	sunmodel:SetModel("Spells\\druid_wrath_missile_v2.m2")
 	sunmodel:SetAlpha(1)
-	sunmodel:SetPosition(3, 0, 1.35)
+	sunmodel:SetPosition(1 / (UIParentScale * UIParentScale * UIParentScale), 0, 0.45 / (UIParentScale * UIParentScale * UIParentScale))
 	sunmodel:SetAllPoints(sun)
 	sunmodel.value = 25
 end
@@ -1054,7 +1082,7 @@ function PlantsVsGhouls:CreateCursorTemp()
 		cursortemp:SetAlpha(1)
 		cursortemp:SetWidth(125)
 		cursortemp:SetHeight(125)
-		cursortemp:SetPosition(6.20, 0.03, 2.70)
+		cursortemp:SetPosition(4.18 / UIParentScale, 0.03 / UIParentScale, 1.793 / UIParentScale)
 		cursortemp:SetRotation(math.rad(128))
 	end
 end
@@ -1120,11 +1148,10 @@ local modelslotx = CreateFrame("PlayerModel", nil, frame)
 function PlantsVsGhouls:InitModelSlotX()
 	modelslotx:SetModel("World\\Generic\\goblin\\passivedoodads\\kezan\\items\\goblin_beachshovel_02.m2")
 	modelslotx:SetAlpha(1)
-	modelslotx:SetPosition(6.20, 0.03, 2.70)
+	modelslotx:SetPosition(4.18 / UIParentScale, 0.03 / UIParentScale, 1.793 / UIParentScale)
 	modelslotx:SetRotation(math.rad(128))
 	modelslotx:SetAllPoints(slotx)
 end
-PlantsVsGhouls:InitModelSlotX()
 
 modelslotx:SetScript("OnMouseDown", function(self, button)
 	if GameStarted and not GamePaused then
@@ -1522,10 +1549,12 @@ function PlantsVsGhouls:InitModelGhouls(model, type, createdline, skip)
 		model:SetDisplayInfo(GhoulTypes[type].model[r])
 		model.id = GhoulTypes[type].model[r]
 	else
-		model:SetDisplayInfo(model.id)
+		if model.id then
+			model:SetDisplayInfo(model.id)
+		end
 	end
 	if not skip then
-		model.distance = GhoulTypes[type].distance
+		model.distance = GhoulTypes[type].distance * UIParentScale
 		model.yaw = GhoulTypes[type].yaw
 		model.pitch = GhoulTypes[type].pitch
 		model.startpos = GhoulTypes[type].startpos
@@ -1548,6 +1577,9 @@ function PlantsVsGhouls:InitModelGhouls(model, type, createdline, skip)
 			model:SetPosition(model.z, 0, 0)
 		end
 		self:ChangeGhoulAnimation(model, 5)
+	end
+	for i = 1, 5 do
+		Ghouls[i].model:SetAllPoints(Ghouls[i].frame)
 	end
 end
 
@@ -2139,6 +2171,19 @@ function PlantsVsGhouls:InitAll()
 	PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\dirt_rise.ogg", "Master")
 end
 
+UIParent:HookScript('OnSizeChanged', function(self, width, height)
+	UIParentScale = UIParent:GetScale()
+	PlantsVsGhouls:InitSunModel()
+	PlantsVsGhouls:InitModelSlotX()
+	for i = 1, 5 do
+		if Ghouls[i].model and Ghouls[i].model.distance and Ghouls[i].model.yaw and Ghouls[i].model.pitch then
+			Ghouls[i].model.distance = GhoulTypes[Ghouls[i].model.type].distance * UIParentScale
+			PlantsVsGhouls:SetOrientation(Ghouls[i].model, Ghouls[i].model.distance, Ghouls[i].model.yaw, Ghouls[i].model.pitch)
+		end
+	end
+	--print(UIParentScale)
+end)
+
 SlashCmdList["PlantsVsGhouls"] = function(msg)
 	PlantsVsGhouls:SlashCommands(msg)
 end
@@ -2188,6 +2233,8 @@ function PlantsVsGhouls:SlashCommands(msg)
 				mainframe:Show()
 			end
 		end
+	else
+		print(UIParent:GetScale(), UIParentScale)
 	end
 end
 
