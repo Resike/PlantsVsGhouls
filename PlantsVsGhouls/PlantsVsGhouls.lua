@@ -104,7 +104,16 @@ local Slots = {
 	[5] = {frame, model, cooldown}
 }
 
-local Debug = false
+local Sun = {
+	-- (658)
+	[1] = {frame, model},
+	[2] = {frame, model},
+	[3] = {frame, model},
+	[4] = {frame, model},
+	[5] = {frame, model}
+}
+
+local Debug = true
 
 local CurrentLine = nil
 local CurrentRow = nil
@@ -1208,6 +1217,39 @@ for i = 1, 5 do
 	Ghouls[i].model:SetAllPoints(Ghouls[i].frame)
 end
 
+for i = 1, 5 do
+	Sun[i].frame = CreateFrame("Frame", nil, frame)
+	Sun[i].frame:SetFrameStrata("High")
+	if i == 1 then
+		Sun[i].frame:SetPoint("Bottom", Plants[1][i].frame, "Top", 0, 100)
+	elseif i == 2 then
+		Sun[i].frame:SetPoint("Bottom", Plants[1][i + 1].frame, "Top", 0, 100)
+	elseif i == 3 then
+		Sun[i].frame:SetPoint("Bottom", Plants[1][i + 2].frame, "Top", 0, 100)
+	elseif i == 4 then
+		Sun[i].frame:SetPoint("Bottom", Plants[1][i + 3].frame, "Top", 0, 100)
+	elseif i == 5 then
+		Sun[i].frame:SetPoint("Bottom", Plants[1][i + 4].frame, "Top", 0, 100)
+	end
+	Sun[i].frame:SetAlpha(1)
+	Sun[i].frame:SetWidth(150)
+	Sun[i].frame:SetHeight(150)
+	if Debug == true then
+		Sun[i].frame:SetBackdrop(SlotBackdrop)
+		Sun[i].frame:SetBackdropColor(0.8, 0.8, 0.2, 0.5)
+	end
+	Sun[i].model = CreateFrame("PlayerModel", nil, Sun[i].frame)
+	Sun[i].model:SetAllPoints(Sun[i].frame)
+end
+
+function PlantsVsGhouls:InitModelSuns(model)
+	model:SetModel("Spells\\druid_wrath_missile_v2.m2")
+	model:SetAlpha(1)
+	model:SetWidth(150)
+	model:SetHeight(150)
+	model:SetPosition(2, 0, 0.9)
+end
+
 function PlantsVsGhouls:SlotOnMouseDown(button, model, cooldown)
 	if GameStarted and not GamePaused and (not cooldown.start or GetTime() > (cooldown.start + PlantTypes[model.type].cooldown)) then
 		DestroyMode = false
@@ -1468,35 +1510,45 @@ function PlantsVsGhouls:ChangeGhoulAnimation(model, anim)
 	end
 end
 
-function PlantsVsGhouls:InitModelGhouls(model, type, createdline)
-	model.type = type
-	model.line = createdline
-	model.next = 9
-	model.pos = 900 + math.random(50, 150)
-	local r = math.random((#GhoulTypes[type].model))
-	model:SetDisplayInfo(GhoulTypes[type].model[r])
-	model.distance = GhoulTypes[type].distance
-	model.yaw = GhoulTypes[type].yaw
-	model.pitch = GhoulTypes[type].pitch
-	model.startpos = GhoulTypes[type].startpos
-	model.endpos = GhoulTypes[type].endpos
-	model.stoppos = GhoulTypes[type].stoppos
-	model.speed = GhoulTypes[type].speed
-	model.damage = GhoulTypes[type].damage
+function PlantsVsGhouls:InitModelGhouls(model, type, createdline, skip)
+	if not skip then
+		model.type = type
+		model.line = createdline
+		model.next = 9
+		model.pos = 900 + math.random(50, 150)
+	end
+	if not skip then
+		local r = math.random((#GhoulTypes[type].model))
+		model:SetDisplayInfo(GhoulTypes[type].model[r])
+		model.id = GhoulTypes[type].model[r]
+	else
+		model:SetDisplayInfo(model.id)
+	end
+	if not skip then
+		model.distance = GhoulTypes[type].distance
+		model.yaw = GhoulTypes[type].yaw
+		model.pitch = GhoulTypes[type].pitch
+		model.startpos = GhoulTypes[type].startpos
+		model.endpos = GhoulTypes[type].endpos
+		model.stoppos = GhoulTypes[type].stoppos
+		model.speed = GhoulTypes[type].speed
+		model.damage = GhoulTypes[type].damage
+	end
 	model:SetWidth(200)
 	model:SetHeight(200)
 	model:SetAlpha(1)
 	model:SetCustomCamera(1)
-	model:SetRotation(math.rad(0))
 	self:SetOrientation(model, model.distance, model.yaw, model.pitch)
-	if type == 1 then
-		model:SetPosition(- 3, 0, 0)
-		model.z = - 3
-	elseif type == 2 or type == 3 then
-		model:SetPosition(- 3.75, 0, 0)
-		model.z = - 3.75
+	if not skip then
+		if type == 1 then
+			model.z = - 3
+			model:SetPosition(model.z, 0, 0)
+		elseif type == 2 or type == 3 then
+			model.z = - 3.75
+			model:SetPosition(model.z, 0, 0)
+		end
+		self:ChangeGhoulAnimation(model, 5)
 	end
-	self:ChangeGhoulAnimation(model, 5)
 end
 
 function PlantsVsGhouls:GetDistance(obj1, obj2)
@@ -1505,6 +1557,9 @@ end
 
 function PlantsVsGhouls:GetBaseCameraTarget(model)
 	if model:GetObjectType() ~= "PlayerModel" then
+		if Debug then
+			print("Not \"PlayerModel\" type!")
+		end
 		return
 	end
 	local modelfile = model:GetModel()
@@ -1520,6 +1575,9 @@ end
 
 function PlantsVsGhouls:SetOrientation(model, distance, yaw, pitch)
 	if model:GetObjectType() ~= "PlayerModel" then
+		if Debug then
+			print("Not \"PlayerModel\" type!")
+		end
 		return
 	end
 	if model:HasCustomCamera() then
@@ -1527,15 +1585,22 @@ function PlantsVsGhouls:SetOrientation(model, distance, yaw, pitch)
 		local y = distance * math.sin(- yaw) * math.cos(pitch)
 		local z = (distance * math.sin(- pitch))
 		model:SetCameraPosition(x, y, z)
-		--[[local x, y, z = self:GetBaseCameraTarget(model)
+		local x, y, z = self:GetBaseCameraTarget(model)
 		if x and y and z then
 			model:SetCameraTarget(x, y, z)
-		end]]
+		end
+	else
+		if Debug then
+			print("Model has no custom camera!")
+		end
 	end
 end
 
 function PlantsVsGhouls:SetModelTilt(model, tiltdegree)
 	if model:GetObjectType() ~= "PlayerModel" then
+		if Debug then
+			print("Not \"PlayerModel\" type!")
+		end
 		return
 	end
 	if model:HasCustomCamera() then
@@ -1548,10 +1613,14 @@ function PlantsVsGhouls:SetModelTilt(model, tiltdegree)
 		else
 			model:SetCameraPosition(0.1, y, zz)
 		end
-	end
-	local x, y, z = self:GetBaseCameraTarget(model)
-	if y and z then
-		model:SetCameraTarget(0, y, z)
+		local x, y, z = self:GetBaseCameraTarget(model)
+		if y and z then
+			model:SetCameraTarget(0, y, z)
+		end
+	else
+		if Debug then
+			print("Model has no custom camera!")
+		end
 	end
 end
 
@@ -1835,6 +1904,11 @@ function PlantsVsGhouls:Mainmenu()
 		optionspanelframe:Hide()
 	end
 	self:ClearLevel()
+	for i = 1, 5 do
+		local r = math.random(3)
+		self:InitModelGhouls(Ghouls[i].model, r, i)
+		Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", Ghouls[i].model.pos, 10)
+	end
 	GamePaused = false
 	GameStarted = false
 	sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
@@ -1906,12 +1980,12 @@ function PlantsVsGhouls:RestartLevel()
 	if optionspanelframe:IsVisible() then
 		optionspanelframe:Hide()
 	end
+	self:ClearLevel()
 	for i = 1, 5 do
 		local r = math.random(3)
 		self:InitModelGhouls(Ghouls[i].model, r, i)
 		Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", Ghouls[i].model.pos, 10)
 	end
-	self:ClearLevel()
 	GamePaused = false
 	GameStarted = false
 	sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
@@ -1986,6 +2060,9 @@ function PlantsVsGhouls:ClearLevel()
 			Plants[i][j].model:ClearModel()
 		end
 	end
+	for i = 1, 5 do
+		Ghouls[i].model:ClearModel()
+	end
 end
 
 function PlantsVsGhouls:TogglePause()
@@ -1995,11 +2072,9 @@ function PlantsVsGhouls:TogglePause()
 	end
 	if GamePaused then
 		self:ResumeGame()
-		pausetext:SetText("Pause")
 		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
 	else
 		self:PauseGame()
-		pausetext:SetText("Resume")
 		PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\pause.ogg", "Master")
 	end
 end
@@ -2016,6 +2091,7 @@ function PlantsVsGhouls:PauseGame()
 			Slots[i].cooldown.remains = PlantTypes[Slots[i].model.type].cooldown - (time - Slots[i].cooldown.start)
 		end
 	end
+	pausetext:SetText("Resume")
 end
 
 function PlantsVsGhouls:ResumeGame()
@@ -2028,6 +2104,7 @@ function PlantsVsGhouls:ResumeGame()
 			Slots[i].cooldown.start = time - (PlantTypes[Slots[i].model.type].cooldown - Slots[i].cooldown.remains)
 		end
 	end
+	pausetext:SetText("Pause")
 end
 
 function PlantsVsGhouls:InitAll()
@@ -2047,6 +2124,9 @@ function PlantsVsGhouls:InitAll()
 	for i = 1, 5 do
 		local r = math.random(3)
 		self:InitModelGhouls(Ghouls[i].model, r, i)
+	end
+	for i = 1, 5 do
+		self:InitModelSuns(Sun[i].model)
 	end
 	sodonerowframe:Hide()
 	viewtimer = 0
@@ -2070,15 +2150,43 @@ function PlantsVsGhouls:SlashCommands(msg)
 		sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
 		sodend:SetWidth(60)
 		percentCompleted = 0
-		if mainframe:IsVisible() then
-			self:DisableModes()
-			self:ClearCursorTemp()
-			self:ClearTemp()
-			mainframe:Hide()
+		if GameStarted == true then
+			if frame:IsVisible() then
+				self:DisableModes()
+				self:ClearCursorTemp()
+				self:ClearTemp()
+				self:PauseGame()
+				frame:Hide()
+			else
+				frame:Show()
+				self:InitSunModel()
+				for i = 1, 5 do
+					self:InitModelSlots(Slots[i].model, 1)
+				end
+				self:InitModelSlotX()
+				for i = 1, 5 do
+					for j = 1, 9 do
+						self:InitModelPlants(Plants[i][j].model, i, j)
+					end
+				end
+				for i = 1, 5 do
+					self:InitModelGhouls(Ghouls[i].model, nil, i, true)
+				end
+				for i = 1, 5 do
+					self:InitModelSuns(Sun[i].model)
+				end
+			end
 		else
-			frame:Hide()
-			self:InitModelSky()
-			mainframe:Show()
+			if mainframe:IsVisible() then
+				self:DisableModes()
+				self:ClearCursorTemp()
+				self:ClearTemp()
+				mainframe:Hide()
+			else
+				frame:Hide()
+				self:InitModelSky()
+				mainframe:Show()
+			end
 		end
 	end
 end
