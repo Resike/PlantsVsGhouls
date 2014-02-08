@@ -3,21 +3,24 @@ local _, ns = ...
 local PlantsVsGhouls = { }
 ns.PlantsVsGhouls = PlantsVsGhouls
 
-local math = math
 local ipairs = ipairs
+local math = math
+local print = print
 local UIParent = UIParent
 
+local CreateFontString = CreateFontString
 local CreateFrame = CreateFrame
 local CreateTexture = CreateTexture
-local CreateFontString = CreateFontString
 local GetCursorPosition = GetCursorPosition
 local GetObjectType = GetObjectType
 local GetTime = GetTime
 local IsMouseButtonDown = IsMouseButtonDown
 local PlaySoundFile = PlaySoundFile
+local UnitName = UnitName
 
 local BaseScale = 0.73142856359482
-local UIParentScale
+local UIParentScale = 1
+local WindowScale = 1
 
 local Plants = {
 	[1] = {
@@ -92,11 +95,11 @@ local Ghouls = {
 
 local GhoulTypes = {
 	-- Vanilla Ghoul (508)
-	[1] = {model = {[1] = 137, [2] = 414, [3] = 519, [4] = 547}, distance = 4.5772 / BaseScale, yaw = - 1.5346, pitch = - 0.9802, startpos = - 170, endpos = - 120, stoppos = - 30, speed = 0.3, damage = 34, health = 100},
+	[1] = {model = {[1] = 137, [2] = 414, [3] = 519, [4] = 547}, distance = 4.5772 / BaseScale, yaw = - 1.5346, pitch = - 0.9802, startpos = - 150, endpos = - 100, stoppos = - 20, speed = 0.3, damage = 34, health = 100},
 	-- Burning Crusade Ghoul (938)
-	[2] = {model = {[1] = 24992, [2] = 24993, [3] = 24994, [4] = 24995}, distance = 5.5772 / BaseScale, yaw = - 1.5346, pitch = - 0.9802, startpos = - 170, endpos = - 120, stoppos = - 30, speed = 0.4, damage = 41, health = 150},
+	[2] = {model = {[1] = 24992, [2] = 24993, [3] = 24994, [4] = 24995}, distance = 5.5772 / BaseScale, yaw = - 1.5346, pitch = - 0.9802, startpos = - 150, endpos = - 100, stoppos = - 20, speed = 0.4, damage = 41, health = 150},
 	-- Burning Crusade Ghoul Spiked (939)
-	[3] = {model = {[1] = 28292, [2] = 30656}, distance = 5.5772 / BaseScale, yaw = - 1.5346, pitch = - 0.9802, startpos = - 170, endpos = - 120, stoppos = - 30, speed = 0.4, damage = 45, health = 175}
+	[3] = {model = {[1] = 28292, [2] = 30656}, distance = 5.5772 / BaseScale, yaw = - 1.5346, pitch = - 0.9802, startpos = - 150, endpos = - 100, stoppos = - 20, speed = 0.4, damage = 45, health = 175}
 }
 
 local Slots = {
@@ -116,7 +119,11 @@ local Sun = {
 	[5] = {frame, model}
 }
 
-local Debug = true
+local Debug = false
+
+if UnitName("player") == "Resike" then
+	Debug = true
+end
 
 local CurrentLine = nil
 local CurrentRow = nil
@@ -137,17 +144,6 @@ local GamePaused = false
 
 local GameStarted = false
 
-local Backdrop = {
-	--edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
-	edgeSize = 10,
-	insets = {
-		left = 11,
-		right = 11,
-		top = 11,
-		bottom = 11
-	}
-}
-
 local SlotBackdrop = {
 	bgFile = "Interface\\Buttons\\White8x8.blp",
 	--[[edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
@@ -161,7 +157,7 @@ local SlotBackdrop = {
 }
 
 local mainframe = CreateFrame("Frame", nil, UIParent)
-mainframe:SetFrameStrata("Medium")
+mainframe:SetFrameStrata("High")
 mainframe:SetPoint("Center", 0, 0)
 mainframe:SetWidth(1100)
 mainframe:SetHeight(700)
@@ -184,18 +180,8 @@ end
 
 mainframe:SetScript("OnEvent", PlantsVsGhouls.OnEvent)
 
-local function GetScreenHeightScale()
-	local screenHeight = 768
-	return GetScreenHeight() / screenHeight
-end
-
-local function GetScreenWidthScale()
-	local screenWidth = 1024
-	return GetScreenWidth() / screenWidth
-end
-
 local skyframe = CreateFrame("Frame", nil, mainframe)
-skyframe:SetFrameStrata("Low")
+skyframe:SetFrameStrata("Medium")
 skyframe:SetWidth(1100)
 skyframe:SetHeight(700)
 skyframe:SetAlpha(1)
@@ -222,7 +208,7 @@ house:SetDrawLayer("Background", - 1)
 house:SetPoint("BottomLeft", mainframe, "BottomLeft", 0, 0)
 
 local treeframe = CreateFrame("Frame", nil, mainframe)
-treeframe:SetFrameStrata("Medium")
+treeframe:SetFrameStrata("High")
 treeframe:SetWidth(476)
 treeframe:SetHeight(700)
 treeframe:SetAlpha(1)
@@ -283,7 +269,8 @@ dirt:SetPoint("Bottom", gravemask, "Bottom", - 100, 38)
 dirt:Hide()
 
 local startframe = CreateFrame("Frame", nil, mainframe)
-startframe:SetFrameStrata("Medium")
+startframe:SetFrameStrata("High")
+startframe:SetFrameLevel(2)
 startframe:SetWidth(331)
 startframe:SetHeight(146)
 startframe:SetAlpha(1)
@@ -309,6 +296,7 @@ start:SetPoint("BottomLeft", startframe, "BottomLeft", 0, 0)
 
 local minigamesframe = CreateFrame("Frame", nil, mainframe)
 minigamesframe:SetFrameStrata("High")
+minigamesframe:SetFrameLevel(3)
 minigamesframe:SetWidth(313)
 minigamesframe:SetHeight(133)
 minigamesframe:SetAlpha(1)
@@ -365,7 +353,8 @@ minigamesframe:SetScript("OnMouseDown", function(self, button)
 end)
 
 local puzzleframe = CreateFrame("Frame", nil, mainframe)
-puzzleframe:SetFrameStrata("Dialog")
+puzzleframe:SetFrameStrata("High")
+puzzleframe:SetFrameLevel(4)
 puzzleframe:SetWidth(286)
 puzzleframe:SetHeight(122)
 puzzleframe:SetAlpha(1)
@@ -422,7 +411,8 @@ puzzleframe:SetScript("OnMouseDown", function(self, button)
 end)
 
 local survivalframe = CreateFrame("Frame", nil, mainframe)
-survivalframe:SetFrameStrata("Fullscreen")
+survivalframe:SetFrameStrata("High")
+survivalframe:SetFrameLevel(5)
 survivalframe:SetWidth(266)
 survivalframe:SetHeight(123)
 survivalframe:SetAlpha(1)
@@ -479,7 +469,8 @@ survivalframe:SetScript("OnMouseDown", function(self, button)
 end)
 
 local optionsframe = CreateFrame("Frame", nil, mainframe)
-optionsframe:SetFrameStrata("Fullscreen")
+optionsframe:SetFrameStrata("High")
+optionsframe:SetFrameLevel(6)
 optionsframe:SetWidth(81)
 optionsframe:SetHeight(31)
 optionsframe:SetAlpha(1)
@@ -530,7 +521,8 @@ mainoptionspanelframe:SetPoint("Center", mainframe, "Center", 0, 0)
 mainoptionspanelframe:Hide()
 
 local quitframe = CreateFrame("Frame", nil, mainframe)
-quitframe:SetFrameStrata("Fullscreen")
+quitframe:SetFrameStrata("High")
+quitframe:SetFrameLevel(6)
 quitframe:SetWidth(47)
 quitframe:SetHeight(27)
 quitframe:SetAlpha(1)
@@ -846,7 +838,8 @@ frame:SetScript("OnMouseUp", function(self, button)
 end)
 
 local map = frame:CreateTexture(nil, "Background")
-map:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\BackgroundSun.tga")
+--map:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\BackgroundSun.tga")
+map:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\BackgroundSunUnsodded.tga")
 map:SetWidth(1100)
 map:SetHeight(600)
 map:SetAlpha(1)
@@ -1229,7 +1222,10 @@ for i = 1, 5 do
 			Plants[i][j].frame:SetHeight(98)
 		end
 		Plants[i][j].frame:SetAlpha(1)
-		Plants[i][j].frame:SetBackdrop(Backdrop)
+		if Debug == true then
+			Plants[i][j].frame:SetBackdrop(SlotBackdrop)
+			Plants[i][j].frame:SetBackdropColor(0.2, 0.7, 0.2, 0.5)
+		end
 		Plants[i][j].frame.x = Plants[i][j].frame:GetWidth() / 2
 		Plants[i][j].frame.y = Plants[i][j].frame:GetHeight() / 2.5
 		Plants[i][j].model = CreateFrame("PlayerModel", nil, Plants[i][j].frame)
@@ -1371,8 +1367,10 @@ function PlantsVsGhouls:CreatePlant(model)
 		CurrentSlot:SetCooldown(GetTime(), PlantTypes[CurrentPlant].cooldown)
 		CurrentSlot.start = GetTime()
 		self:InitModelPlants(model, CurrentLine, CurrentRow)
-		if self:GetDistance(Plants[CurrentLine][CurrentRow].frame, Ghouls[CurrentLine].model) > Ghouls[CurrentLine].model.startpos and self:GetDistance(Plants[CurrentLine][CurrentRow].frame, Ghouls[CurrentLine].model) < Ghouls[CurrentLine].model.endpos then
-			Ghouls[CurrentLine].model.next = CurrentRow
+		for i = 1, #Ghouls do
+			if CurrentLine == Ghouls[i].model.line and self:GetDistance(Plants[CurrentLine][CurrentRow].frame, Ghouls[CurrentLine].model) > Ghouls[CurrentLine].model.startpos and self:GetDistance(Plants[CurrentLine][CurrentRow].frame, Ghouls[CurrentLine].model) < Ghouls[CurrentLine].model.endpos then
+				Ghouls[CurrentLine].model.next = CurrentRow
+			end
 		end
 		PlantsVsGhouls:DisableModes()
 		cursortemp:SetScript("OnUpdate", nil)
@@ -1455,25 +1453,25 @@ function PlantsVsGhouls:ChangeGhoulAnimation(model, anim)
 				model:SetSequenceTime(anim, elapsed)
 				if anim == 5 then
 					if model.type == 1 then
-						if model.z == 0 or Ghouls[model.line].frame:GetRight() > frame:GetRight() then
+						if model.z == 0 or Ghouls[model.line].frame:GetRight() * WindowScale > frame:GetRight() then
 							Ghouls[model.line].frame:SetPoint("Right", Plants[model.line][1].frame, "Right", model.pos, 10)
 						else
 							if model.z < 0 then
-								model:SetPosition(model.z, 0, 0)
+								model:SetPosition(model.z, 0.7, 0)
 							else
 								model.z = 0
-								model:SetPosition(model.z, 0, 0)
+								model:SetPosition(model.z, 0.7, 0)
 							end
 						end
 					elseif model.type == 2 or model.type == 3 then
-						if model.z == 0.5 or Ghouls[model.line].frame:GetRight() > frame:GetRight() then
+						if model.z == 0 or Ghouls[model.line].frame:GetRight() * WindowScale > frame:GetRight() then
 							Ghouls[model.line].frame:SetPoint("Right", Plants[model.line][1].frame, "Right", model.pos, 10)
 						else
-							if model.z < 0.5 then
-								model:SetPosition(model.z, 0, 0)
+							if model.z < 0 then
+								model:SetPosition(model.z, 0.7, 0)
 							else
-								model.z = 0.5
-								model:SetPosition(model.z, 0, 0)
+								model.z = 0
+								model:SetPosition(model.z, 0.7, 0)
 							end
 						end
 					end
@@ -1498,13 +1496,13 @@ function PlantsVsGhouls:ChangeGhoulAnimation(model, anim)
 					end
 					if model.pos > model.stoppos then
 						if model.type == 1 then
-							if model.z == 0 or Ghouls[model.line].frame:GetRight() > frame:GetRight() then
+							if model.z == 0 or Ghouls[model.line].frame:GetRight() * WindowScale > frame:GetRight() then
 								model.pos = model.pos - model.speed
 							else
 								model.z = model.z + (model.speed / 50)
 							end
 						elseif model.type == 2 or model.type == 3 then
-							if model.z == 0.5 or Ghouls[model.line].frame:GetRight() > frame:GetRight() then
+							if model.z == 0 or Ghouls[model.line].frame:GetRight() * WindowScale > frame:GetRight() then
 								model.pos = model.pos - model.speed
 							else
 								model.z = model.z + (model.speed / 50)
@@ -1605,14 +1603,14 @@ function PlantsVsGhouls:InitModelGhouls(model, type, createdline, skip)
 	model:SetHeight(200)
 	model:SetAlpha(1)
 	model:SetCustomCamera(1)
-	self:SetOrientation(model, model.distance, model.yaw, model.pitch)
+	self:SetOrientation(model)
 	if not skip then
 		if type == 1 then
-			model.z = - 3
-			model:SetPosition(model.z, 0, 0)
+			model.z = - 3.75
+			model:SetPosition(model.z, 0.7, 0)
 		elseif type == 2 or type == 3 then
 			model.z = - 3.75
-			model:SetPosition(model.z, 0, 0)
+			model:SetPosition(model.z, 0.7, 0)
 		end
 		self:ChangeGhoulAnimation(model, 5)
 	end
@@ -1640,21 +1638,23 @@ function PlantsVsGhouls:GetBaseCameraTarget(model)
 	end
 end
 
-function PlantsVsGhouls:SetOrientation(model, distance, yaw, pitch)
+function PlantsVsGhouls:SetOrientation(model, target)
 	if model:GetObjectType() ~= "PlayerModel" then
 		if Debug then
 			print("Not \"PlayerModel\" type!")
 		end
 		return
 	end
-	if model:HasCustomCamera() then
-		local x = distance * math.cos(yaw) * math.cos(pitch)
-		local y = distance * math.sin(- yaw) * math.cos(pitch)
-		local z = (distance * math.sin(- pitch))
+	if model:HasCustomCamera() and model.distance and model.yaw and model.pitch then
+		local x = model.distance * math.cos(model.yaw) * math.cos(model.pitch)
+		local y = model.distance * math.sin(- model.yaw) * math.cos(model.pitch)
+		local z = (model.distance * math.sin(- model.pitch))
 		model:SetCameraPosition(x, y, z)
-		local x, y, z = self:GetBaseCameraTarget(model)
-		if x and y and z then
-			model:SetCameraTarget(x, y, z)
+		if not target then
+			local x, y, z = self:GetBaseCameraTarget(model)
+			if x and y and z then
+				model:SetCameraTarget(0, 0, 0)
+			end
 		end
 	else
 		if Debug then
@@ -1966,33 +1966,6 @@ mainmenu:SetScript("OnMouseDown", function(self, button)
 	end
 end)
 
-function PlantsVsGhouls:Mainmenu()
-	if optionspanelframe:IsVisible() then
-		optionspanelframe:Hide()
-	end
-	self:ClearLevel()
-	for i = 1, 5 do
-		local r = math.random(3)
-		self:InitModelGhouls(Ghouls[i].model, r, i)
-		Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", Ghouls[i].model.pos, 10)
-	end
-	GamePaused = false
-	GameStarted = false
-	sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
-	sodend:SetWidth(60)
-	percentCompleted = 0
-	sodonerowframe:Hide()
-	viewtimer = 0
-	viewCompleted = 0
-	viewCompleted2 = 0.215
-	holdtimer = 0
-	animtimer = 0
-	animtimer2 = 0
-	frame:Hide()
-	self:InitModelSky()
-	mainframe:Show()
-end
-
 local restart = CreateFrame("Button", nil, optionspanelframe)
 restart:SetPoint("Bottom", optionspanel, "Bottom", 0, 170)
 restart:SetWidth(200)
@@ -2042,31 +2015,6 @@ restart:SetScript("OnMouseDown", function(self, button)
 		restart:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
 	end
 end)
-
-function PlantsVsGhouls:RestartLevel()
-	if optionspanelframe:IsVisible() then
-		optionspanelframe:Hide()
-	end
-	self:ClearLevel()
-	for i = 1, 5 do
-		local r = math.random(3)
-		self:InitModelGhouls(Ghouls[i].model, r, i)
-		Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", Ghouls[i].model.pos, 10)
-	end
-	GamePaused = false
-	GameStarted = false
-	sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
-	sodend:SetWidth(60)
-	percentCompleted = 0
-	sodonerowframe:Hide()
-	viewtimer = 0
-	viewCompleted = 0
-	viewCompleted2 = 0.215
-	holdtimer = 0
-	view:SetScript("OnUpdate", PlantsVsGhouls.ViewOnUpdate)
-	animtimer = 0
-	animtimer2 = 0
-end
 
 local pause = CreateFrame("Button", nil, frame)
 pause:SetPoint("TopRight", frame, "TopRight", - 100, 0)
@@ -2119,6 +2067,66 @@ pause:SetScript("OnMouseDown", function(self, button)
 		pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
 	end
 end)
+
+function PlantsVsGhouls:Mainmenu()
+	if optionspanelframe:IsVisible() then
+		optionspanelframe:Hide()
+	end
+	self:ClearLevel()
+	for i = 1, 5 do
+		local r = math.random(3)
+		self:InitModelGhouls(Ghouls[i].model, r, i)
+		Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", Ghouls[i].model.pos, 10)
+		Ghouls[i].model.distance = GhoulTypes[Ghouls[i].model.type].distance * UIParentScale * WindowScale
+		self:SetOrientation(Ghouls[i].model, true)
+		Ghouls[i].model:SetPosition(Ghouls[i].model.z / WindowScale, 0.7, 0)
+	end
+	GamePaused = false
+	GameStarted = false
+	sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
+	sodend:SetWidth(60)
+	percentCompleted = 0
+	sodonerowframe:Hide()
+	viewtimer = 0
+	viewCompleted = 0
+	viewCompleted2 = 0.215
+	holdtimer = 0
+	animtimer = 0
+	animtimer2 = 0
+	frame:Hide()
+	self:InitModelSky()
+	mainframe:Show()
+	pausetext:SetText("Pause")
+end
+
+function PlantsVsGhouls:RestartLevel()
+	if optionspanelframe:IsVisible() then
+		optionspanelframe:Hide()
+	end
+	self:ClearLevel()
+	for i = 1, 5 do
+		local r = math.random(3)
+		self:InitModelGhouls(Ghouls[i].model, r, i)
+		Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", Ghouls[i].model.pos, 10)
+		Ghouls[i].model.distance = GhoulTypes[Ghouls[i].model.type].distance * UIParentScale * WindowScale
+		self:SetOrientation(Ghouls[i].model, true)
+		Ghouls[i].model:SetPosition(Ghouls[i].model.z / WindowScale, 0.7, 0)
+	end
+	GamePaused = false
+	GameStarted = false
+	sodendcap:SetSize(72 * math.sqrt(2), 72 * math.sqrt(2))
+	sodend:SetWidth(60)
+	percentCompleted = 0
+	sodonerowframe:Hide()
+	viewtimer = 0
+	viewCompleted = 0
+	viewCompleted2 = 0.215
+	holdtimer = 0
+	view:SetScript("OnUpdate", PlantsVsGhouls.ViewOnUpdate)
+	animtimer = 0
+	animtimer2 = 0
+	pausetext:SetText("Pause")
+end
 
 function PlantsVsGhouls:ClearLevel()
 	for i = 1, 5 do
@@ -2209,12 +2217,11 @@ UIParent:HookScript('OnSizeChanged', function(self, width, height)
 	PlantsVsGhouls:InitSunModel()
 	PlantsVsGhouls:InitModelSlotX()
 	for i = 1, 5 do
-		if Ghouls[i].model and Ghouls[i].model.distance and Ghouls[i].model.yaw and Ghouls[i].model.pitch then
-			Ghouls[i].model.distance = GhoulTypes[Ghouls[i].model.type].distance * UIParentScale
-			PlantsVsGhouls:SetOrientation(Ghouls[i].model, Ghouls[i].model.distance, Ghouls[i].model.yaw, Ghouls[i].model.pitch)
+		if Ghouls[i].model and Ghouls[i].model.distance then
+			Ghouls[i].model.distance = GhoulTypes[Ghouls[i].model.type].distance * UIParentScale * WindowScale
+			PlantsVsGhouls:SetOrientation(Ghouls[i].model)
 		end
 	end
-	--print(UIParentScale)
 end)
 
 SlashCmdList["PlantsVsGhouls"] = function(msg)
@@ -2266,7 +2273,7 @@ function PlantsVsGhouls:SlashCommands(msg)
 				mainframe:Show()
 			end
 		end
-	else
+	elseif msg == "ui" then
 		print(UIParent:GetScale(), UIParentScale)
 	end
 end
@@ -2291,13 +2298,8 @@ function PlantsVsGhouls:ResizeFrame(frame)
 	frame.resizetextureleft:SetWidth(16)
 	frame.resizetextureleft:SetHeight(16)
 	frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-	if frame == mainframe then
-		frame:SetMaxResize(Width * 1.3, Height * 1.3)
-		frame:SetMinResize(Width / 1.2, Height / 1.2)
-	else
-		frame:SetMaxResize(Width * 1.5, Height * 1.5)
-		frame:SetMinResize(Width / 1.5, Height / 1.5)
-	end
+	frame:SetMaxResize(Width * 1.3, Height * 1.3)
+	frame:SetMinResize(Width / 1.2, Height / 1.2)
 	frame:SetResizable(true)
 	frame.resizeframeleft:SetScript("OnEnter", function(self)
 		frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
@@ -2317,6 +2319,8 @@ function PlantsVsGhouls:ResizeFrame(frame)
 			frame:SetHeight(Height)
 		end
 		if button == "MiddleButton" then
+			frame.resizeframeleft:Hide()
+			frame.resizeframeright:Hide()
 			ScaleLocked = true
 			frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
 		else
@@ -2368,6 +2372,8 @@ function PlantsVsGhouls:ResizeFrame(frame)
 			frame:SetHeight(Height)
 		end
 		if button == "MiddleButton" then
+			frame.resizeframeleft:Hide()
+			frame.resizeframeright:Hide()
 			ScaleLocked = true
 			frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
 		else
@@ -2391,37 +2397,162 @@ function PlantsVsGhouls:ResizeFrame(frame)
 		frame.scrollframe:SetScale(s)
 		local childrens = {self:GetChildren()}
 		for _, child in ipairs(childrens) do
-			if child ~= frame.resizeframeleft and child ~= frame.resizeframeright and child ~= sunmodel and child ~= modelslotx and child ~= startframe and child ~= minigamesframe and child ~= puzzleframe and child ~= survivalframe and child ~= optionsframe and child ~= quitframe and child ~= ghoulframe then
+			if child ~= frame.resizeframeleft and child ~= frame.resizeframeright and child ~= startframe and child ~= minigamesframe and child ~= puzzleframe and child ~= survivalframe and child ~= optionsframe and child ~= quitframe and child ~= ghoulframe then
+				child:SetScale(s)
+			end
+		end
+		gravemask:SetWidth(730 / s)
+		gravemask:SetHeight(560 / s)
+		dirt:SetWidth(150 / s)
+		dirt:SetHeight(32 / s)
+		dirt:SetPoint("Bottom", gravemask, "Bottom", - 100 / s, 38 / s)
+		flower1:SetWidth(36 / s)
+		flower1:SetHeight(47 / s)
+		flower1:SetPoint("BottomRight", maskframe, "BottomRight", - 80 / s, 125 / s)
+		flower2:SetWidth(43 / s)
+		flower2:SetHeight(43 / s)
+		flower2:SetPoint("BottomRight", maskframe, "BottomRight", - 120 / s, 125 / s)
+		flower3:SetWidth(46 / s)
+		flower3:SetHeight(53 / s)
+		flower3:SetPoint("BottomRight", maskframe, "BottomRight", - 20 / s, 90 / s)
+		self:SetHeight(Height * s)
+	end)
+end
+
+function PlantsVsGhouls:ResizeLevelFrame(frame)
+	local Width = frame:GetWidth()
+	local Height = frame:GetHeight()
+	frame.resizeframeleft = CreateFrame("Frame", nil, frame)
+	frame.resizeframeleft:SetFrameStrata("Fullscreen_Dialog")
+	frame.resizeframeleft:SetPoint("BottomRight", frame, "BottomRight", 0, 0)
+	frame.resizeframeleft:SetWidth(16)
+	frame.resizeframeleft:SetHeight(16)
+	frame.resizeframeleft:SetFrameLevel(frame:GetFrameLevel() + 7)
+	frame.resizeframeleft:EnableMouse(true)
+	if ScaleLocked then
+		frame.resizeframeleft:Hide()
+	else
+		frame.resizeframeleft:Show()
+	end
+	frame.resizetextureleft = frame.resizeframeleft:CreateTexture(nil, "Artwork")
+	frame.resizetextureleft:SetPoint("TopLeft", frame.resizeframeleft, "TopLeft", 0, 0)
+	frame.resizetextureleft:SetWidth(16)
+	frame.resizetextureleft:SetHeight(16)
+	frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	frame:SetMaxResize(Width * 1.5, Height * 1.5)
+	frame:SetMinResize(Width / 1.5, Height / 1.5)
+	frame:SetResizable(true)
+	frame.resizeframeleft:SetScript("OnEnter", function(self)
+		frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+	end)
+	frame.resizeframeleft:SetScript("OnLeave", function(self)
+		frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	end)
+	frame.resizeframeleft:SetScript("OnMouseDown", function(self, button)
+		if button == "LeftButton" then
+			frame:StartSizing("Right")
+		end
+		frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+	end)
+	frame.resizeframeleft:SetScript("OnMouseUp", function(self, button)
+		if button == "RightButton" then
+			frame:SetWidth(Width)
+			frame:SetHeight(Height)
+		end
+		if button == "MiddleButton" then
+			frame.resizeframeleft:Hide()
+			frame.resizeframeright:Hide()
+			ScaleLocked = true
+			frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		else
+			local x, y = GetCursorPosition()
+			local fx = self:GetLeft() * self:GetEffectiveScale()
+			local fy = self:GetBottom() * self:GetEffectiveScale()
+			if x >= fx and x <= (fx + self:GetWidth()) and y >= fy and y <= (fy + self:GetHeight()) then
+				frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+			else
+				frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			end
+			frame:StopMovingOrSizing()
+		end
+	end)
+	frame.resizeframeright = CreateFrame("Frame", nil, frame)
+	frame.resizeframeright:SetFrameStrata("Fullscreen_Dialog")
+	frame.resizeframeright:SetPoint("BottomLeft", frame, "BottomLeft", 0, 0)
+	frame.resizeframeright:SetWidth(16)
+	frame.resizeframeright:SetHeight(16)
+	frame.resizeframeright:SetFrameLevel(frame:GetFrameLevel() + 7)
+	frame.resizeframeright:EnableMouse(true)
+	if ScaleLocked then
+		frame.resizeframeright:Hide()
+	else
+		frame.resizeframeright:Show()
+	end
+	frame.resizetextureright = frame.resizeframeright:CreateTexture(nil, "Artwork")
+	frame.resizetextureright:SetPoint("TopLeft", frame.resizeframeright, "TopLeft", 0, 0)
+	frame.resizetextureright:SetWidth(16)
+	frame.resizetextureright:SetHeight(16)
+	frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	local ULx, ULy, LLx, LLy, URx, URy, LRx, LRy = frame.resizetextureright:GetTexCoord()
+	frame.resizetextureright:SetTexCoord(URx, URy, LRx, LRy, ULx, ULy, LLx, LLy)
+	frame.resizeframeright:SetScript("OnEnter", function(self)
+		frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+	end)
+	frame.resizeframeright:SetScript("OnLeave", function(self)
+		frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	end)
+	frame.resizeframeright:SetScript("OnMouseDown", function(self, button)
+		if button == "LeftButton" then
+			frame:StartSizing("Left")
+		end
+		frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+	end)
+	frame.resizeframeright:SetScript("OnMouseUp", function(self, button)
+		if button == "RightButton" then
+			frame:SetWidth(Width)
+			frame:SetHeight(Height)
+		end
+		if button == "MiddleButton" then
+			frame.resizeframeleft:Hide()
+			frame.resizeframeright:Hide()
+			ScaleLocked = true
+			frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		else
+			local x, y = GetCursorPosition()
+			local fx = self:GetLeft() * self:GetEffectiveScale()
+			local fy = self:GetBottom() * self:GetEffectiveScale()
+			if x >= fx and x <= (fx + self:GetWidth()) and y >= fy and y <= (fy + self:GetHeight()) then
+				frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+			else
+				frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			end
+			frame:StopMovingOrSizing()
+		end
+	end)
+	frame.scrollframe = CreateFrame("ScrollFrame", nil, frame)
+	frame.scrollframe:SetWidth(Width)
+	frame.scrollframe:SetHeight(Height)
+	frame.scrollframe:SetPoint("Topleft", frame, "Topleft", 0, 0)
+	frame:SetScript("OnSizeChanged", function(self)
+		local s = self:GetWidth() / Width
+		WindowScale = s
+		frame.scrollframe:SetScale(s)
+		local childrens = {self:GetChildren()}
+		for _, child in ipairs(childrens) do
+			if child ~= frame.resizeframeleft and child ~= frame.resizeframeright and child ~= sunmodel and child ~= modelslotx then
 				child:SetScale(s)
 			end
 		end
 		for i = 1, 5 do
-			if Ghouls[i].model and Ghouls[i].model.distance and Ghouls[i].model.yaw and Ghouls[i].model.pitch then
+			if Ghouls[i].model and Ghouls[i].model.distance then
 				Ghouls[i].model.distance = GhoulTypes[Ghouls[i].model.type].distance * UIParentScale * s
-				PlantsVsGhouls:SetOrientation(Ghouls[i].model, Ghouls[i].model.distance, Ghouls[i].model.yaw, Ghouls[i].model.pitch)
-				--Ghouls[i].model.pos = Ghouls[i].model.pos * s
-				--Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", Ghouls[i].model.pos, 10)
+				PlantsVsGhouls:SetOrientation(Ghouls[i].model, true)
+				Ghouls[i].model:SetPosition(Ghouls[i].model.z / s, 0.7, 0)
 			end
-		end
-		if frame == mainframe then
-			gravemask:SetWidth(730 / s)
-			gravemask:SetHeight(560 / s)
-			dirt:SetWidth(150 / s)
-			dirt:SetHeight(32 / s)
-			dirt:SetPoint("Bottom", gravemask, "Bottom", - 100 / s, 38 / s)
-			flower1:SetWidth(36 / s)
-			flower1:SetHeight(47 / s)
-			flower2:SetWidth(43 / s)
-			flower2:SetHeight(43 / s)
-			flower3:SetWidth(46 / s)
-			flower3:SetHeight(53 / s)
-			flower1:SetPoint("BottomRight", maskframe, "BottomRight", - 80 / s, 125 / s)
-			flower2:SetPoint("BottomRight", maskframe, "BottomRight", - 120 / s, 125 / s)
-			flower3:SetPoint("BottomRight", maskframe, "BottomRight", - 20 / s, 90 / s)
 		end
 		self:SetHeight(Height * s)
 	end)
 end
 
 PlantsVsGhouls:ResizeFrame(mainframe)
---PlantsVsGhouls:ResizeFrame(frame)
+PlantsVsGhouls:ResizeLevelFrame(frame)
