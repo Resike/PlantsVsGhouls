@@ -549,9 +549,9 @@ quitframe:SetScript("OnEnter", function(self)
 			if mainoptionspanelframe:IsVisible() then
 				mainoptionspanelframe:Hide()
 			end
+			mainframe:Hide()
 			quit:SetPoint("BottomLeft", quitframe, "BottomLeft", 0, 0)
 			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
-			mainframe:Hide()
 		end
 	end)
 end)
@@ -678,9 +678,9 @@ function PlantsVsGhouls:InitModelGhoul()
 						if mainoptionspanelframe:IsVisible() then
 							mainoptionspanelframe:Hide()
 						end
+						PlantsVsGhouls:InitModelGhoul()
 						start:SetPoint("BottomLeft", startframe, "BottomLeft", 0, 0)
 						startshadow:SetPoint("Center", startframe, "Center", 0, 0)
-						PlantsVsGhouls:InitModelGhoul()
 						PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\losemusic.ogg", "Master")
 					end
 				end)
@@ -711,13 +711,11 @@ function PlantsVsGhouls:InitModelGhoul()
 					end
 				end)
 			end)
-
 			optionsframe:SetScript("OnLeave", function(self)
 				options:SetTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Options.tga")
 				options:SetPoint("BottomLeft", optionsframe, "BottomLeft", 0, 0)
 				optionsframe:SetScript("OnMouseUp", nil)
 			end)
-
 			optionsframe:SetScript("OnMouseDown", function(self, button)
 				if button == "LeftButton" then
 					options:SetPoint("BottomLeft", optionsframe, "BottomLeft", 1, 1)
@@ -735,9 +733,9 @@ function PlantsVsGhouls:InitModelGhoul()
 						if mainoptionspanelframe:IsVisible() then
 							mainoptionspanelframe:Hide()
 						end
+						mainframe:Hide()
 						quit:SetPoint("BottomLeft", quitframe, "BottomLeft", 0, 0)
 						PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
-						mainframe:Hide()
 					end
 				end)
 			end)
@@ -1590,7 +1588,7 @@ function PlantsVsGhouls:InitModelGhouls(model, type, createdline, skip)
 		end
 	end
 	if not skip then
-		model.distance = GhoulTypes[type].distance * UIParentScale
+		model.distance = GhoulTypes[type].distance * UIParentScale * WindowScale
 		model.yaw = GhoulTypes[type].yaw
 		model.pitch = GhoulTypes[type].pitch
 		model.startpos = GhoulTypes[type].startpos
@@ -1739,6 +1737,8 @@ menu:SetScript("OnEnter", function(self, button)
 	menu:SetScript("OnMouseUp", function(self, button)
 		if button == "LeftButton" then
 			PlantsVsGhouls:ToggleMenu()
+			menu:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+			menu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
 			menutext:SetPoint("Center", menu, "Center", 0, 0)
 		end
 	end)
@@ -1807,6 +1807,8 @@ mainback:SetScript("OnEnter", function(self, button)
 			if mainoptionspanelframe:IsVisible() then
 				mainoptionspanelframe:Hide()
 			end
+			mainback:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+			mainback:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButtonDown.tga")
 			mainbacktext:SetPoint("Center", mainback, "Center", 0, 0)
 			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
 		end
@@ -1892,9 +1894,11 @@ back:SetScript("OnEnter", function(self, button)
 	back:SetScript("OnMouseUp", function(self, button)
 		if button == "LeftButton" then
 			optionspanelframe:Hide()
+			PlantsVsGhouls:ResumeGame()
+			back:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButton.tga")
+			back:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\OptionsPanelBackButtonDown.tga")
 			backtext:SetPoint("Center", back, "Center", 0, 0)
 			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
-			PlantsVsGhouls:ResumeGame()
 		end
 	end)
 end)
@@ -1942,9 +1946,11 @@ mainmenu:SetScript("OnEnter", function(self, button)
 	mainmenutext:SetTextColor(0, 1, 0, 1)
 	mainmenu:SetScript("OnMouseUp", function(self, button)
 		if button == "LeftButton" then
+			PlantsVsGhouls:Mainmenu()
+			mainmenu:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+			mainmenu:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
 			mainmenutext:SetPoint("Center", mainmenu, "Center", 0, 0)
 			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
-			PlantsVsGhouls:Mainmenu()
 		end
 	end)
 end)
@@ -1992,9 +1998,11 @@ restart:SetScript("OnEnter", function(self, button)
 	restarttext:SetTextColor(0, 1, 0, 1)
 	restart:SetScript("OnMouseUp", function(self, button)
 		if button == "LeftButton" then
+			PlantsVsGhouls:RestartLevel()
+			restart:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+			restart:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
 			restarttext:SetPoint("Center", restart, "Center", 0, 0)
 			PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\buttonclick.ogg", "Master")
-			PlantsVsGhouls:RestartLevel()
 		end
 	end)
 end)
@@ -2046,6 +2054,8 @@ pause:SetScript("OnEnter", function(self, button)
 				optionspanelframe:Hide()
 			end
 			PlantsVsGhouls:TogglePause()
+			pause:SetNormalTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\Button.tga")
+			pause:SetPushedTexture("Interface\\AddOns\\PlantsVsGhouls\\Textures\\ButtonDown.tga")
 			pausetext:SetPoint("Center", pause, "Center", 0, 0)
 		end
 	end)
@@ -2077,9 +2087,6 @@ function PlantsVsGhouls:Mainmenu()
 		local r = math.random(3)
 		self:InitModelGhouls(Ghouls[i].model, r, i)
 		Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", Ghouls[i].model.pos, 10)
-		Ghouls[i].model.distance = GhoulTypes[Ghouls[i].model.type].distance * UIParentScale * WindowScale
-		self:SetOrientation(Ghouls[i].model, true)
-		Ghouls[i].model:SetPosition(Ghouls[i].model.z / WindowScale, 0.7, 0)
 	end
 	GamePaused = false
 	GameStarted = false
@@ -2108,9 +2115,6 @@ function PlantsVsGhouls:RestartLevel()
 		local r = math.random(3)
 		self:InitModelGhouls(Ghouls[i].model, r, i)
 		Ghouls[i].frame:SetPoint("Right", Plants[i][1].frame, "Right", Ghouls[i].model.pos, 10)
-		Ghouls[i].model.distance = GhoulTypes[Ghouls[i].model.type].distance * UIParentScale * WindowScale
-		self:SetOrientation(Ghouls[i].model, true)
-		Ghouls[i].model:SetPosition(Ghouls[i].model.z / WindowScale, 0.7, 0)
 	end
 	GamePaused = false
 	GameStarted = false
@@ -2547,7 +2551,6 @@ function PlantsVsGhouls:ResizeLevelFrame(frame)
 			if Ghouls[i].model and Ghouls[i].model.distance then
 				Ghouls[i].model.distance = GhoulTypes[Ghouls[i].model.type].distance * UIParentScale * s
 				PlantsVsGhouls:SetOrientation(Ghouls[i].model, true)
-				Ghouls[i].model:SetPosition(Ghouls[i].model.z / s, 0.7, 0)
 			end
 		end
 		self:SetHeight(Height * s)
