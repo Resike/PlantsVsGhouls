@@ -121,7 +121,8 @@ local Sun = {
 
 local Debug = false
 
-if UnitName("player") == "Resike" then
+local _, battleTag = BNGetInfo()
+if battleTag == "Resike#2247" then
 	Debug = true
 end
 
@@ -164,21 +165,6 @@ mainframe:SetHeight(700)
 mainframe:SetAlpha(1)
 mainframe:SetMovable(true)
 mainframe:Hide()
-
---mainframe:RegisterEvent("ADDON_LOADED")
---mainframe:RegisterEvent("PLAYER_ENTERING_WORLD")
-mainframe:RegisterEvent("VARIABLES_LOADED")
-
-function PlantsVsGhouls:OnEvent(event, ...)
-	if event == "VARIABLES_LOADED" then
-		UIParentScale = UIParent:GetScale()
-		for i = 1, #GhoulTypes do
-			--GhoulTypes[i].distance = GhoulTypes[i].distance * UIParentScale
-		end
-	end
-end
-
-mainframe:SetScript("OnEvent", PlantsVsGhouls.OnEvent)
 
 local skyframe = CreateFrame("Frame", nil, mainframe)
 skyframe:SetFrameStrata("Medium")
@@ -1220,7 +1206,7 @@ for i = 1, 5 do
 			Plants[i][j].frame:SetHeight(98)
 		end
 		Plants[i][j].frame:SetAlpha(1)
-		if Debug == true then
+		if Debug then
 			Plants[i][j].frame:SetBackdrop(SlotBackdrop)
 			Plants[i][j].frame:SetBackdropColor(0.2, 0.7, 0.2, 0.5)
 		end
@@ -1246,7 +1232,7 @@ for i = 1, 5 do
 	Ghouls[i].frame:SetAlpha(1)
 	Ghouls[i].frame:SetWidth(200)
 	Ghouls[i].frame:SetHeight(200)
-	if Debug == true then
+	if Debug then
 		Ghouls[i].frame:SetBackdrop(SlotBackdrop)
 		Ghouls[i].frame:SetBackdropColor(0.8, 0.2, 0.2, 0.5)
 	end
@@ -1271,7 +1257,7 @@ for i = 1, 5 do
 	Sun[i].frame:SetAlpha(1)
 	Sun[i].frame:SetWidth(150)
 	Sun[i].frame:SetHeight(150)
-	if Debug == true then
+	if Debug then
 		Sun[i].frame:SetBackdrop(SlotBackdrop)
 		Sun[i].frame:SetBackdropColor(0.8, 0.8, 0.2, 0.5)
 	end
@@ -2216,7 +2202,7 @@ function PlantsVsGhouls:InitAll()
 	PlaySoundFile("Interface\\AddOns\\PlantsVsGhouls\\Sounds\\dirt_rise.ogg", "Master")
 end
 
-UIParent:HookScript('OnSizeChanged', function(self, width, height)
+UIParent:HookScript("OnSizeChanged", function(self, width, height)
 	UIParentScale = UIParent:GetScale()
 	PlantsVsGhouls:InitSunModel()
 	PlantsVsGhouls:InitModelSlotX()
