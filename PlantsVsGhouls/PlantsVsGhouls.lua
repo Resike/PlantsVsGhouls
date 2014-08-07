@@ -2527,41 +2527,6 @@ function PlantsVsGhouls:ResizeFrame(frame)
 		frame.direction = nil
 		frame:StopMovingOrSizing()
 	end)
-	--[[frame:SetScript("OnSizeChanged", function(self)
-		if not self.resizing then
-			return
-		end
-		local left, bottom = self:GetLeft(), self:GetBottom()
-		if self.direction == "TopLeft" or self.direction == "TopRight" then
-			self:ClearAllPoints()
-			if frame.direction == "TopLeft" then
-				self:SetPoint("BottomRight", UIParent, "BottomRight", - (UIParent:GetWidth() - (left + self:GetWidth())), bottom)
-			else
-				self:SetPoint("BottomLeft", UIParent, "BottomLeft", left, bottom)
-			end
-			local s = self:GetHeight() / frame.height
-			self:SetWidth(frame.width * s)
-			MoveAnyFrame:ScaleChildrens(frame, s)
-			MoveAnyFrame:ScaleTextures(frame, s)
-			MoveAnyFrame:RepositionButtons(frame, s)
-			MoveAnyFrame.dbo.scale = s
-			MoveAnyFrame.dbo.width = self:GetWidth()
-			MoveAnyFrame.dbo.height = self:GetHeight()
-			--print(MoveAnyFrame.dbo.width, MoveAnyFrame.dbo.height)
-		else
-			self:ClearAllPoints()
-			self:SetPoint("TopLeft", UIParent, "TopLeft", left, (UIParent:GetWidth() - (bottom + self:GetHeight())))
-			local s = self:GetWidth() / frame.width
-			self:SetHeight(frame.height * s)
-			MoveAnyFrame:ScaleChildrens(frame, s)
-			MoveAnyFrame:ScaleTextures(frame, s)
-			MoveAnyFrame:RepositionButtons(frame, s)
-			MoveAnyFrame.dbo.scale = s
-			MoveAnyFrame.dbo.width = self:GetWidth()
-			MoveAnyFrame.dbo.height = self:GetHeight()
-			--print(MoveAnyFrame.dbo.width, MoveAnyFrame.dbo.height)
-		end
-	end)]]
 	frame:SetScript("OnSizeChanged", function(self)
 		if not self.resizing then
 			return
@@ -2626,136 +2591,310 @@ function PlantsVsGhouls:ResizeFrame(frame)
 end
 
 function PlantsVsGhouls:ResizeLevelFrame(frame)
-	local Width = frame:GetWidth()
-	local Height = frame:GetHeight()
-	frame.resizeframeleft = CreateFrame("Frame", nil, frame)
-	frame.resizeframeleft:SetFrameStrata("Fullscreen_Dialog")
-	frame.resizeframeleft:SetPoint("BottomRight", frame, "BottomRight", 0, 0)
-	frame.resizeframeleft:SetWidth(16)
-	frame.resizeframeleft:SetHeight(16)
-	frame.resizeframeleft:SetFrameLevel(frame:GetFrameLevel() + 7)
-	frame.resizeframeleft:EnableMouse(true)
-	if ScaleLocked then
-		frame.resizeframeleft:Hide()
-	else
-		frame.resizeframeleft:Show()
+		if not frame then
+		return
 	end
-	frame.resizetextureleft = frame.resizeframeleft:CreateTexture(nil, "Artwork")
-	frame.resizetextureleft:SetPoint("TopLeft", frame.resizeframeleft, "TopLeft", 0, 0)
-	frame.resizetextureleft:SetWidth(16)
-	frame.resizetextureleft:SetHeight(16)
-	frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-	frame:SetMaxResize(Width * 1.5, Height * 1.5)
-	frame:SetMinResize(Width / 1.5, Height / 1.5)
+	if frame.resizable then
+		return
+	end
+	frame.resizable = true
+	frame.width = frame:GetWidth()
+	frame.height = frame:GetHeight()
+	frame.frameLevel = frame:GetFrameLevel()
+	if frame.frameLevel > 13 then
+		frame.frameLevel = 13
+	end
+	frame:SetMovable(true)
 	frame:SetResizable(true)
-	frame.resizeframeleft:SetScript("OnEnter", function(self)
-		frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+	frame:SetMaxResize(frame.width * 1.5, frame.height * 1.5)
+	frame:SetMinResize(frame.width / 1.5, frame.height / 1.5)
+	frame:SetUserPlaced(true)
+	frame.bottomrightframe = CreateFrame("Frame", nil, frame)
+	frame.bottomrightframe:SetFrameStrata("Fullscreen_Dialog")
+	frame.bottomrightframe:SetPoint("BottomRight", frame, "BottomRight", 0, 0)
+	frame.bottomrightframe:SetWidth(16)
+	frame.bottomrightframe:SetHeight(16)
+	frame.bottomrightframe:SetFrameLevel(frame.frameLevel + 7)
+	frame.bottomrightframe:EnableMouse(true)
+	--[[if ScaleLocked then
+		frame.bottomrightframe:Hide()
+	else
+		frame.bottomrightframe:Show()
+	end]]
+	frame.bottomrighttexture = frame.bottomrightframe:CreateTexture(nil, "Overlay")
+	frame.bottomrighttexture:SetPoint("TopLeft", frame.bottomrightframe, "TopLeft", 0, 0)
+	frame.bottomrighttexture:SetWidth(16)
+	frame.bottomrighttexture:SetHeight(16)
+	frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	frame.bottomrightframe:SetScript("OnEnter", function(self)
+		frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
 	end)
-	frame.resizeframeleft:SetScript("OnLeave", function(self)
-		frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	frame.bottomrightframe:SetScript("OnLeave", function(self)
+		frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
 	end)
-	frame.resizeframeleft:SetScript("OnMouseDown", function(self, button)
+	frame.bottomrightframe:SetScript("OnMouseDown", function(self, button)
 		if button == "LeftButton" then
+			frame.resizing = true
 			frame:StartSizing("Right")
 		end
-		frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+		frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+		frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+		frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
 	end)
-	frame.resizeframeleft:SetScript("OnMouseUp", function(self, button)
-		if button == "RightButton" then
-			frame:SetWidth(Width)
-			frame:SetHeight(Height)
-		end
+	frame.bottomrightframe:SetScript("OnMouseUp", function(self, button)
 		if button == "MiddleButton" then
-			frame.resizeframeleft:Hide()
-			frame.resizeframeright:Hide()
-			ScaleLocked = true
-			frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-		else
-			local x, y = GetCursorPosition()
-			local fx = self:GetLeft() * self:GetEffectiveScale()
-			local fy = self:GetBottom() * self:GetEffectiveScale()
-			if x >= fx and x <= (fx + self:GetWidth()) and y >= fy and y <= (fy + self:GetHeight()) then
-				frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
-			else
-				frame.resizetextureleft:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-			end
-			frame:StopMovingOrSizing()
+			frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
 		end
+		local x, y = GetCursorPosition()
+		local fx = self:GetLeft() * self:GetEffectiveScale()
+		local fy = self:GetBottom() * self:GetEffectiveScale()
+		if x >= fx and x <= (fx + self:GetWidth()) and y >= fy and y <= (fy + self:GetHeight()) then
+			frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+			frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+			frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		else
+			frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		end
+		frame.resizing = nil
+		frame.direction = nil
+		frame:StopMovingOrSizing()
 	end)
-	frame.resizeframeright = CreateFrame("Frame", nil, frame)
-	frame.resizeframeright:SetFrameStrata("Fullscreen_Dialog")
-	frame.resizeframeright:SetPoint("BottomLeft", frame, "BottomLeft", 0, 0)
-	frame.resizeframeright:SetWidth(16)
-	frame.resizeframeright:SetHeight(16)
-	frame.resizeframeright:SetFrameLevel(frame:GetFrameLevel() + 7)
-	frame.resizeframeright:EnableMouse(true)
-	if ScaleLocked then
-		frame.resizeframeright:Hide()
+	frame.bottomleftframe = CreateFrame("Frame", nil, frame)
+	frame.bottomleftframe:SetFrameStrata("Fullscreen_Dialog")
+	frame.bottomleftframe:SetPoint("BottomLeft", frame, "BottomLeft", 0, 0)
+	frame.bottomleftframe:SetWidth(16)
+	frame.bottomleftframe:SetHeight(16)
+	frame.bottomleftframe:SetFrameLevel(frame.frameLevel + 7)
+	frame.bottomleftframe:EnableMouse(true)
+	--[[if ScaleLocked then
+		frame.bottomleftframe:Hide()
 	else
-		frame.resizeframeright:Show()
-	end
-	frame.resizetextureright = frame.resizeframeright:CreateTexture(nil, "Artwork")
-	frame.resizetextureright:SetPoint("TopLeft", frame.resizeframeright, "TopLeft", 0, 0)
-	frame.resizetextureright:SetWidth(16)
-	frame.resizetextureright:SetHeight(16)
-	frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-	local ULx, ULy, LLx, LLy, URx, URy, LRx, LRy = frame.resizetextureright:GetTexCoord()
-	frame.resizetextureright:SetTexCoord(URx, URy, LRx, LRy, ULx, ULy, LLx, LLy)
-	frame.resizeframeright:SetScript("OnEnter", function(self)
-		frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		frame.bottomleftframe:Show()
+	end]]
+	frame.bottomlefttexture = frame.bottomleftframe:CreateTexture(nil, "Overlay")
+	local ULx, ULy, LLx, LLy, URx, URy, LRx, LRy = frame.bottomlefttexture:GetTexCoord()
+	frame.bottomlefttexture:SetTexCoord(URx, URy, LRx, LRy, ULx, ULy, LLx, LLy)
+	frame.bottomlefttexture:SetPoint("TopLeft", frame.bottomleftframe, "TopLeft", 0, 0)
+	frame.bottomlefttexture:SetWidth(16)
+	frame.bottomlefttexture:SetHeight(16)
+	frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	frame.bottomleftframe:SetScript("OnEnter", function(self)
+		frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
 	end)
-	frame.resizeframeright:SetScript("OnLeave", function(self)
-		frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	frame.bottomleftframe:SetScript("OnLeave", function(self)
+		frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
 	end)
-	frame.resizeframeright:SetScript("OnMouseDown", function(self, button)
+	frame.bottomleftframe:SetScript("OnMouseDown", function(self, button)
 		if button == "LeftButton" then
+			frame.resizing = true
 			frame:StartSizing("Left")
 		end
-		frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+		frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+		frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+		frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
 	end)
-	frame.resizeframeright:SetScript("OnMouseUp", function(self, button)
-		if button == "RightButton" then
-			frame:SetWidth(Width)
-			frame:SetHeight(Height)
-		end
+	frame.bottomleftframe:SetScript("OnMouseUp", function(self, button)
 		if button == "MiddleButton" then
-			frame.resizeframeleft:Hide()
-			frame.resizeframeright:Hide()
-			ScaleLocked = true
-			frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		end
+		local x, y = GetCursorPosition()
+		local fx = self:GetLeft() * self:GetEffectiveScale()
+		local fy = self:GetBottom() * self:GetEffectiveScale()
+		if x >= fx and x <= (fx + self:GetWidth()) and y >= fy and y <= (fy + self:GetHeight()) then
+			frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+			frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+			frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
 		else
-			local x, y = GetCursorPosition()
-			local fx = self:GetLeft() * self:GetEffectiveScale()
-			local fy = self:GetBottom() * self:GetEffectiveScale()
-			if x >= fx and x <= (fx + self:GetWidth()) and y >= fy and y <= (fy + self:GetHeight()) then
-				frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
-			else
-				frame.resizetextureright:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-			end
-			frame:StopMovingOrSizing()
+			frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
 		end
+		frame.resizing = nil
+		frame.direction = nil
+		frame:StopMovingOrSizing()
 	end)
-	frame.scrollframe = CreateFrame("ScrollFrame", nil, frame)
-	frame.scrollframe:SetWidth(Width)
-	frame.scrollframe:SetHeight(Height)
-	frame.scrollframe:SetPoint("Topleft", frame, "Topleft", 0, 0)
+	frame.topleftframe = CreateFrame("Frame", nil, frame)
+	frame.topleftframe:SetFrameStrata("Fullscreen_Dialog")
+	frame.topleftframe:SetPoint("TopLeft", frame, "TopLeft", 0, 0)
+	frame.topleftframe:SetWidth(16)
+	frame.topleftframe:SetHeight(16)
+	frame.topleftframe:SetFrameLevel(frame.frameLevel + 7)
+	frame.topleftframe:EnableMouse(true)
+	--[[if ScaleLocked then
+		frame.topleftframe:Hide()
+	else
+		frame.topleftframe:Show()
+	end]]
+	frame.toplefttexture = frame.topleftframe:CreateTexture(nil, "Overlay")
+	local ULx, ULy, LLx, LLy, URx, URy, LRx, LRy = frame.toplefttexture:GetTexCoord()
+	frame.toplefttexture:SetTexCoord(LRx, LRy, URx, URy, LLx, LLy, ULx, ULy)
+	frame.toplefttexture:SetPoint("TopLeft", frame.topleftframe, "TopLeft", 0, 0)
+	frame.toplefttexture:SetWidth(16)
+	frame.toplefttexture:SetHeight(16)
+	frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	frame.topleftframe:SetScript("OnEnter", function(self)
+		frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+	end)
+	frame.topleftframe:SetScript("OnLeave", function(self)
+		frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	end)
+	frame.topleftframe:SetScript("OnMouseDown", function(self, button)
+		if button == "LeftButton" then
+			frame.resizing = true
+			frame.direction = "TopLeft"
+			frame:StartSizing("Top")
+		end
+		frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+		frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+		frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+	end)
+	frame.topleftframe:SetScript("OnMouseUp", function(self, button)
+		if button == "MiddleButton" then
+			frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		end
+		local x, y = GetCursorPosition()
+		local fx = self:GetLeft() * self:GetEffectiveScale()
+		local fy = self:GetBottom() * self:GetEffectiveScale()
+		if x >= fx and x <= (fx + self:GetWidth()) and y >= fy and y <= (fy + self:GetHeight()) then
+			frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+			frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+			frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		else
+			frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.bottomlefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		end
+		frame.resizing = nil
+		frame.direction = nil
+		frame:StopMovingOrSizing()
+	end)
+	frame.toprightframe = CreateFrame("Frame", nil, frame)
+	frame.toprightframe:SetFrameStrata("Fullscreen_Dialog")
+	frame.toprightframe:SetPoint("TopRight", frame, "TopRight", 0, 0)
+	frame.toprightframe:SetWidth(16)
+	frame.toprightframe:SetHeight(16)
+	frame.toprightframe:SetFrameLevel(frame.frameLevel + 7)
+	frame.toprightframe:EnableMouse(true)
+	--[[if ScaleLocked then
+		frame.toprightframe:Hide()
+	else
+		frame.toprightframe:Show()
+	end]]
+	frame.toprighttexture = frame.toprightframe:CreateTexture(nil, "Overlay")
+	local ULx, ULy, LLx, LLy, URx, URy, LRx, LRy = frame.toprighttexture:GetTexCoord()
+	frame.toprighttexture:SetTexCoord(LLx, LLy, ULx, ULy, LRx, LRy, URx, URy)
+	frame.toprighttexture:SetPoint("TopLeft", frame.toprightframe, "TopLeft", 0, 0)
+	frame.toprighttexture:SetWidth(16)
+	frame.toprighttexture:SetHeight(16)
+	frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	frame.toprightframe:SetScript("OnEnter", function(self)
+		frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+	end)
+	frame.toprightframe:SetScript("OnLeave", function(self)
+		frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	end)
+	frame.toprightframe:SetScript("OnMouseDown", function(self, button)
+		if button == "LeftButton" then
+			frame.resizing = true
+			frame.direction = "TopRight"
+			frame:StartSizing("Top")
+		end
+		frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+		frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+		frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+	end)
+	frame.toprightframe:SetScript("OnMouseUp", function(self, button)
+		if button == "MiddleButton" then
+			frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		end
+		local x, y = GetCursorPosition()
+		local fx = self:GetLeft() * self:GetEffectiveScale()
+		local fy = self:GetBottom() * self:GetEffectiveScale()
+		if x >= fx and x <= (fx + self:GetWidth()) and y >= fy and y <= (fy + self:GetHeight()) then
+			frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+			frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+			frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+		else
+			frame.toprighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.toplefttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+			frame.bottomrighttexture:SetTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+		end
+		frame.resizing = nil
+		frame.direction = nil
+		frame:StopMovingOrSizing()
+	end)
 	frame:SetScript("OnSizeChanged", function(self)
-		local s = self:GetWidth() / Width
-		WindowScale = s
-		frame.scrollframe:SetScale(s)
-		local childrens = {self:GetChildren()}
-		for _, child in ipairs(childrens) do
-			if child ~= frame.resizeframeleft and child ~= frame.resizeframeright and child ~= sunmodel and child ~= modelslotx then
-				child:SetScale(s)
-			end
+		if not self.resizing then
+			return
 		end
-		for i = 1, 5 do
-			if Ghouls[i].model and Ghouls[i].model.distance then
-				Ghouls[i].model.distance = GhoulTypes[Ghouls[i].model.type].distance * UIParentScale * s
-				PlantsVsGhouls:SetOrientation(Ghouls[i].model, true)
+		local left, bottom = self:GetLeft(), self:GetBottom()
+		if self.direction == "TopLeft" or self.direction == "TopRight" then
+			self:ClearAllPoints()
+			if frame.direction == "TopLeft" then
+				self:SetPoint("BottomRight", UIParent, "BottomRight", - (UIParent:GetWidth() - (left + self:GetWidth())), bottom)
+			else
+				self:SetPoint("BottomLeft", UIParent, "BottomLeft", left, bottom)
 			end
+			local s = self:GetHeight() / frame.height
+			WindowScale = s
+			local childrens = {self:GetChildren()}
+			for _, child in ipairs(childrens) do
+				if child ~= frame.bottomleftframe and child ~= frame.bottomrightframe and child ~= frame.toprightframe and child ~= frame.topleftframe and child ~= frame.toprightframe and child ~= sunmodel and child ~= modelslotx then
+					child:SetScale(s)
+				end
+			end
+			for i = 1, 5 do
+				if Ghouls[i].model and Ghouls[i].model.distance then
+					Ghouls[i].model.distance = GhoulTypes[Ghouls[i].model.type].distance * UIParentScale * s
+					PlantsVsGhouls:SetOrientation(Ghouls[i].model, true)
+				end
+			end
+			self:SetWidth(frame.width * s)
+		else
+			self:ClearAllPoints()
+			self:SetPoint("TopLeft", UIParent, "TopLeft", left, (UIParent:GetWidth() - (bottom + self:GetHeight())))
+			local s = self:GetWidth() / frame.width
+			WindowScale = s
+			local childrens = {self:GetChildren()}
+			for _, child in ipairs(childrens) do
+				if child ~= frame.bottomleftframe and child ~= frame.bottomrightframe and child ~= frame.toprightframe and child ~= frame.topleftframe and child ~= frame.toprightframe and child ~= sunmodel and child ~= modelslotx then
+					child:SetScale(s)
+				end
+			end
+			for i = 1, 5 do
+				if Ghouls[i].model and Ghouls[i].model.distance then
+					Ghouls[i].model.distance = GhoulTypes[Ghouls[i].model.type].distance * UIParentScale * s
+					PlantsVsGhouls:SetOrientation(Ghouls[i].model, true)
+				end
+			end
+			self:SetHeight(frame.height * s)
 		end
-		self:SetHeight(Height * s)
 	end)
 end
 
